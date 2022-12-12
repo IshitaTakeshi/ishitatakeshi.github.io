@@ -1,0 +1,12 @@
+{% extends "!layout.html" %}
+
+{% set sidebars = sidebars + ['github_button.html'] %}
+
+{% block extrahead %}
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+    {{ super() }}
+{% endblock %}
