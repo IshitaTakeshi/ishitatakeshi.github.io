@@ -35,7 +35,7 @@ jobs:
           python3 -m pip install --upgrade pip
 
       - name: Install dependencies
-        run: python3 -m pip install sphinx alabaster
+        run: python3 -m pip install -r requirements.txt
 
       - name: Make the sphinx docs
         run: |
