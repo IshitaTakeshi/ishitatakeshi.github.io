@@ -19,3 +19,4 @@ Takeshi Ishita
    so3
    sba
    dvo
+   graph-slam
