@@ -38,7 +38,7 @@ Graph SLAMによる姿勢推定および地図作成
 これらを用いて再投影誤差
 
 .. math::
-    || \mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j}) ||^2
+    [\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j})]^{\top}R_{ij}^{-1}[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j})]
 
 を計算することができる。これを :math:`\mathbf{x}_{i}` と  :math:`\mathbf{m}_{j}` の間のエッジに対応させる。
 
@@ -49,12 +49,12 @@ Graph SLAMによる姿勢推定および地図作成
 ~~~~~~~~~~~~~~~~~~~~
 
 | 確率モデルで表現してみよう。
-| 初期時刻 :math:`0` から時刻 :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`\mathbf{m}_{1:N} = \{\mathbf{m}_{1},...,\mathbf{m}_{N}\}` とする。
+| 初期時刻 :math:`0` から時刻 :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T}` とする。
 | また、この間に得られたIMU観測値の集合を :math:`\mathbf{u}_{1:T} = \{\mathbf{u}_{1},...,\mathbf{u}_{T}\}` 、ランドマーク観測値の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までの観測可能な姿勢とランドマークの組み合わせを表している。
 | 我々の目的は、次の分布を明らかにすることである。
 
 .. math::
-    p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+    p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
     :label: fullslamposterior
 
 | すなわち、IMUやカメラから得られた観測情報を用いて、時刻 :math:`0` から :math:`T` までの姿勢およびその間に観測されたランドマークの分布を求めるという問題である。
@@ -68,8 +68,8 @@ Graph SLAMによる姿勢推定および地図作成
 | まずはベイズの定理に従って :eq:`fullslamposterior` を分解する。
 
 .. math::
-   &p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
-   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},\mathbf{m}_{1:N},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+   &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
    :label: factored-posterior
 
 ここで :math:`\eta_{T}` は次で計算される定数である。 :math:`\eta_{T}` は観測値 :math:`\mathbf{u}_{1:T},Z_{0:T}` の確率分布のみで構成されているため、一度これらが観測されてしまえば :math:`\eta_{T}` は変化しない。したがって姿勢推定の問題では :math:`\eta_{T}` は定数として扱うことができる。
@@ -77,68 +77,68 @@ Graph SLAMによる姿勢推定および地図作成
 .. math::
     \eta_{T} = \frac{p(\mathbf{u}_{1:T},Z_{0:T-1})}{p(\mathbf{u}_{1:T},Z_{0:T})}
 
-| さて、 :math:`Z_{T}` は時刻 :math:`T` に得られたランドマークの観測値だが、 :math:`Z_{T}` の分布は同時刻の姿勢 :math:`\mathbf{x}_{T}` およびそこで観測できるランドマークの座標 :math:`\mathbf{m}_{1:N}` にしか依存しない。これは時刻 :math:`i` から観測された :math:`j` 番目のランドマーク :math:`\mathbf{z}_{ij}` を :math:`\mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})` でモデル化するためである。したがって、 :math:`Z_{T}` の確率分布を次のように単純化できる [#simplify_z_distribution]_ 。
+| さて、 :math:`Z_{T}` は時刻 :math:`T` に得られたランドマークの観測値だが、 :math:`Z_{T}` の分布は同時刻の姿勢 :math:`\mathbf{x}_{T}` およびそこで観測できるランドマークの座標 :math:`M_{0:T}` にしか依存しない。これは時刻 :math:`i` から観測された :math:`j` 番目のランドマーク :math:`\mathbf{z}_{ij}` を :math:`\mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})` でモデル化するためである。したがって、 :math:`Z_{T}` の確率分布を次のように単純化できる [#simplify_z_distribution]_ 。
 
 .. math::
-    p(Z_{T}\;|\;\mathbf{x}_{0:T},\mathbf{m}_{1:N},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1:N})
+    p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T})
 
 
 :eq:`factored-posterior` のもうひとつの確率についてもベイズ則を適用する。
 
 .. math::
-    &p(\mathbf{x}_{0:T},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
-    &= p(\mathbf{x}_{T}\;|\;\mathbf{x}_{0:T-1},\mathbf{m}_{1:N},\mathbf{u}_{1:T},Z_{0:T-1})\;
-      p(\mathbf{x}_{0:T-1},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1})
+    &p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+    &= p(\mathbf{x}_{T}\;|\;\mathbf{x}_{0:T-1},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})\;
+      p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1})
 
 我々は時刻 :math:`T` の姿勢 :math:`\mathbf{x}_{T}` をオドメトリ推定モデル :math:`\mathbf{g}(\mathbf{x}_{T-1}, \mathbf{u}_{T})` で予測する。したがって先ほどと同様の議論により、次のような簡略化を行うことができる。
 
 .. math::
-    &p(\mathbf{x}_{0:T},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+    &p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
     &=
-    p(\mathbf{x}_{T}\;|\;\mathbf{x}_{0:T-1},\mathbf{m}_{1:N},\mathbf{u}_{1:T},Z_{0:T-1})\;
-    p(\mathbf{x}_{0:T-1},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
-    &=
-    p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
-    p(\mathbf{x}_{0:T-1},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+    p(\mathbf{x}_{T}\;|\;\mathbf{x}_{0:T-1},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})\;
+    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
     &=
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
-    p(\mathbf{x}_{0:T-1},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
+    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+    &=
+    p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
+    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
 
 最後の変形は、 :math:`\mathbf{x}_{T-1}` までの姿勢を予測するためには時刻 :math:`T-1` までのIMU観測値があれば十分であることを表している。
 
 これらを総合して式 :eq:`factored-posterior` を再構成すると、時刻 :math:`T-1` における状態分布から時刻 :math:`T` の状態分布を得る式を導くことができる。
 
 .. math::
-   &p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
-   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},\mathbf{m}_{1:N},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+   &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
    &= \eta_{T} \;
-    p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1:N}) \;
+    p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T}) \;
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
-    p(\mathbf{x}_{0:T-1},\mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
+    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
 
 ある時刻の分布はその前の時刻の分布がわかれば導くことができる。これを繰り返していくと次のようになる。
 
 .. math::
    \begin{align}
-   p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+   p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
    = \;
-    & \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1:N}) \; p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T}) \; \\
+    & \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T}) \; p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T}) \; \\
     & ... \\
-    & \eta_{2} \; p(Z_{2}\;|\;\mathbf{x}_{2},\mathbf{m}_{1:N}) \; p(\mathbf{x}_{2}\;|\;\mathbf{x}_{1},\mathbf{u}_{2}) \; \\
-    & \eta_{1} \; p(Z_{1}\;|\;\mathbf{x}_{1},\mathbf{m}_{1:N}) \; p(\mathbf{x}_{1}\;|\;\mathbf{x}_{0},\mathbf{u}_{1}) \; p(\mathbf{x}_{0}) \\
+    & \eta_{2} \; p(Z_{2}\;|\;\mathbf{x}_{2},M_{0:T}) \; p(\mathbf{x}_{2}\;|\;\mathbf{x}_{1},\mathbf{u}_{2}) \; \\
+    & \eta_{1} \; p(Z_{1}\;|\;\mathbf{x}_{1},M_{0:T}) \; p(\mathbf{x}_{1}\;|\;\mathbf{x}_{0},\mathbf{u}_{1}) \; p(\mathbf{x}_{0}) \\
    =\;
-    &\eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[p(Z_{i}\;|\;\mathbf{x}_{i},\mathbf{m}_{1:N}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i})\right] \\
+    &\eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[p(Z_{i}\;|\;\mathbf{x}_{i},M_{0:T}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i})\right] \\
     &\text{where}\quad \eta_{1:T} = \prod_{i=1}^{T} \eta_{i}
    \end{align}
 
-この式では時刻 :math:`0` における姿勢の分布を :math:`p(\mathbf{x}_{0})` と置いている。一般的に :math:`\mathbf{x}_{0}` は推定するものではなく基準座標として任意に定めるものであるため、このように置くことができる。ここでは時刻 :math:`0` においてランドマークの座標は全く不明であると仮定しているが、もし何らかの方法でランドマーク座標の分布を事前に得られるのであれば、時刻 :math:`0` の状態分布は :math:`p(\mathbf{x}_{0}, \mathbf{m}_{1:N})` のようになるであろう。
+この式では時刻 :math:`0` における姿勢の分布を :math:`p(\mathbf{x}_{0})` と置いている。一般的に :math:`\mathbf{x}_{0}` は推定するものではなく基準座標として任意に定めるものであるため、このように置くことができる。ここでは時刻 :math:`0` においてランドマークの座標は全く不明であると仮定しているが、もし何らかの方法でランドマーク座標の分布を事前に得られるのであれば、時刻 :math:`0` の状態分布は :math:`p(\mathbf{x}_{0}, M_{0:T})` のようになるであろう。
 
 一般的なSLAMの問題ではすべてのランドマークをすべての姿勢から観測できるわけではないため、この仮定を踏まえて上記の式をさらに具体的に次のように書くことができる。
 
 .. math::
-   &p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+   &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
    &=
-    \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[p(Z_{i}\;|\;\mathbf{x}_{i},\mathbf{m}_{1:N}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i})\right] \\
+    \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[p(Z_{i}\;|\;\mathbf{x}_{i},M_{0:T}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i})\right] \\
    &=
     \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{k=1}^{T} p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}) \prod_{(i,j)\in S_{0:T}} p(\mathbf{z}_{ij}\;|\;\mathbf{x}_{i},\mathbf{m}_{j})
    :label: posterior-decomposition
@@ -156,7 +156,7 @@ Graph SLAMによる姿勢推定および地図作成
 初期姿勢 :math:`\mathbf{x}_{0}` はプログラム上で固定値にすればよいため分布を仮定する必要はないのだが、便宜的に次のように設定しておく。
 
 .. math::
-    p(\mathbf{x}_{0}) \propto \exp\{-\frac{1}{2}\left[\mathbf{x}_{0} - \mathbf{0}\right]^{\top} Q_{0}^{-1} \left[\mathbf{x}_{0} - \mathbf{0}\right]\} = \mathbf{x}_{0}^{\top} Q_{0}^{-1} \mathbf{x}_{0},\\
+    p(\mathbf{x}_{0}) \propto \exp\{-\frac{1}{2}\left[\mathbf{x}_{0} - \mathbf{0}\right]^{\top} Q_{0}^{-1} \left[\mathbf{x}_{0} - \mathbf{0}\right]\} = \exp(\mathbf{x}_{0}^{\top} Q_{0}^{-1} \mathbf{x}_{0}),\\
    \text{where}\quad Q_{0}^{-1} = \operatorname{diag}(\infty,...,\infty)
 
 これによって初期姿勢が :math:`\mathbf{0}` に拘束される。
@@ -197,12 +197,12 @@ Graph SLAMによる姿勢推定および地図作成
 確率分布が最大値をとるということは、そこに真の状態および真のランドマーク位置がある可能性が高いということである。
 
 .. math::
-    \underset{\mathbf{x}_{0:T},\,\mathbf{m}_{0:N}}{\arg\max} \; p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+    \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
 
 式 :eq:`posterior-decomposition` は正規分布の積で表される。したがってその対数を計算すると指数部分が外れ、最大確率をとる状態を計算しやすくなる。
 
 .. math::
-   &\log p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+   &\log p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
    =\;
    &\text{constant}
    + \log p(\mathbf{x}_{0})
@@ -217,17 +217,17 @@ Graph SLAMによる姿勢推定および地図作成
 対数関数は単調増加関数なので、もとの確率分布を最大化する状態と、対数関数を適用したあとの確率分布を最大化する状態は等しい。
 
 .. math::
-    \underset{\mathbf{x}_{0:T},\,\mathbf{m}_{0:N}}{\arg\max} \; p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
-    &= \underset{\mathbf{x}_{0:T},\,\mathbf{m}_{0:N}}{\arg\max} \; \log p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+    \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+    &= \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; \log p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
 
 結果として、最大確率をとる状態を求める問題はは次の最小化問題に帰結する。
 
 .. math::
-    \underset{\mathbf{x}_{0:T},\,\mathbf{m}_{0:N}}{\arg\max} \; p(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
-    &= \underset{\mathbf{x}_{0:T},\,\mathbf{m}_{0:N}}{\arg\max} \; -E_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
-    &= \underset{\mathbf{x}_{0:T},\,\mathbf{m}_{0:N}}{\arg\min}\; E_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}), \\
+    \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+    &= \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; -E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
+    &= \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\min}\; E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}), \\
     \\
-    E_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+    E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
     &= \mathbf{x}_{0}^{\top}Q_{0}^{-1}\mathbf{x}_{0} \\
     &+ \sum_{k=1}^{T} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1},\mathbf{u}_{k})\right]^{\top} Q_{k}^{-1} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1},\mathbf{u}_{k})\right] \\
     &+ \sum_{(i,j)\in S_{0:T}} \left[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})\right]^{\top}R_{ij}^{-1}\left[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})\right] \\
@@ -236,10 +236,10 @@ Graph SLAMによる姿勢推定および地図作成
 誤差関数の最小化
 ----------------
 
-さて、式 :eq:`error-function` に示す誤差関数は残差 :math:`\mathbf{r}_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})` および共分散行列 :math:`\Sigma_{T}` を用いて次のように表現することができる。
+さて、式 :eq:`error-function` に示す誤差関数は残差 :math:`\mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})` および共分散行列 :math:`\Sigma_{T}` を用いて次のように表現することができる。
 
 .. math::
-   \mathbf{r}_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) =
+   \mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) =
    \begin{bmatrix}
    \mathbf{x}_{0} \\
    \mathbf{x}_{1} - \mathbf{g}(\mathbf{x}_{0}, \mathbf{u}_{1}) \\
@@ -263,10 +263,10 @@ Graph SLAMによる姿勢推定および地図作成
    \end{bmatrix}
 
 .. math::
-   E_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
-   = \mathbf{r}_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{x}_{0:T}, \mathbf{m}_{1:N}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+   E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
+   = \mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
 
-このままでは表記が煩雑なので状態を :math:`\mathbf{y}_{T} = \left[\mathbf{x}_{0:T}^{\top},\; \mathbf{m}_{1:N}^{\top}\right]^{\top}` とおいて次のように書くことにしよう。
+このままでは表記が煩雑なので状態を :math:`\mathbf{y}_{T} = \left[\mathbf{x}_{0:T}^{\top},\; M_{0:T}^{\top}\right]^{\top}` とおいて次のように書くことにしよう。
 
 .. math::
    E_{T}(\mathbf{y}_{T}) = \mathbf{r}_{T}(\mathbf{y}_{T})^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{y}_{T})
@@ -518,8 +518,84 @@ SLAMのヘッシアンは要素の有無がグラフの隣接関係に対応す�
    &D_{4} = {H^{m}_{01}}^{\top}R_{01}^{-1}H^{m}_{01} + {H^{m}_{11}}^{\top}R_{11}^{-1}H^{m}_{11} + {H^{m}_{21}}^{\top}R_{21}^{-1}H^{m}_{21} \\
    &D_{5} = {H^{m}_{12}}^{\top}R_{12}^{-1}H^{m}_{12} + {H^{m}_{32}}^{\top}R_{32}^{-1}H^{m}_{32} \\
 
-ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目のブロックは状態ベクトル :math:`\mathbf{y}_{4} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目のブロックは状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろうか。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列ブロックの要素および5行2列ブロックの要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列ブロックの要素および6行3列ブロックの要素はゼロである。すなわち、ヘッシアンの構造はグラフの隣接行列に対応している。
+ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目のブロックは状態ベクトル :math:`\mathbf{y}_{4} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目のブロックは状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろうか。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列ブロックの要素および5行2列ブロックの要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列ブロックの要素および6行3列ブロックの要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
+
+Sliding window
+~~~~~~~~~~~~~~
+
+さて、時刻が進むにつれて推定対象となる姿勢は増えていく。また新規にランドマークを観測するため、より多くのランドマークの位置を推定しなければならない。一方で、姿勢やランドマークが増えすぎるとその推定にかかる計算量が急速に増大してしまう。
+計算量の増大を防ぐため、多くのSLAMでは Sliding Window という方式がとられる。これは、状態に対して1時刻ぶんの姿勢およびそこから観測されるランドマークを追加すると同時に、状態から最も古い姿勢および不必要なランドマークを除去することで、計算量の増大を防ごうというものである。
+ここではノードの追加と、推定結果全体の整合性を保ったままノードを除去する方法 "Marginalization" を解説する。
+
+Marginalization の目的
+~~~~~~~~~~~~~~~~~~~~~~
+
+さて、時刻 :math:`T` で姿勢およびランドマークの推定が終了したとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{m_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで最適な姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を求めることができる。
+しかしこれには問題がある。時刻 :math:`T+1,T+2,\;`T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、高速に姿勢およびランドマーク座標の推定を行うことができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
+計算量の増大を抑えるため、1時刻ぶんの姿勢およびランドマークを新規に追加するごとに、1時刻ぶんの古い姿勢と不必要なランドマークを削除する必要がある。このように、1時刻ごとに姿勢やランドマークの追加および削除を行う手法を Sliding Window と呼ぶ。
+
+このあと詳しく解説するが、グラフからノード(姿勢やランドマーク)を単純に削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの整合性が取れなくなってしまう。時刻 :math:`0` から最新の時刻までの全体の整合性を保ったまま Window 内にあるノードを最適する手法を Marginalization と呼ぶ。
+
+Marginalization の効果
+~~~~~~~~~~~~~~~~~~~~~~
+
+この問題を解消するために行うのが Marginalization というテクニックである。Marginalization は、古くなった姿勢やランドマークを最適化問題から除去するテクニックであり、次の効果がある。
+
+1. 古くなったランドマークを最適化問題から削除することで計算量の増大を抑えることができる
+2. 古くなったノードを除去しつつも、時刻 `0` から最新時刻までの全体の姿勢およびランドマークの最適化を行うという問題の整合性を保ち続けることができる
+
+Marginalization の手法
+~~~~~~~~~~~~~~~~~~~~~~
+
+Marginalizationは次のような手法である。
+
+まず前提として時刻 :math:`T` までの最適化問題は解かれているものとする。すなわち :math:`p(\mathbf{x}_{0:T}, M_{0:T} | \mathbf{u}_{1:T}, Z_{0:T})` の :math:`\mathbf{x}_{0:T},\,M_{0:T}` についての最大化がされている(等価な問題である誤差関数 :math:`E_{T}` の最小化が済んでいる)ものとする。
+
+時刻 :math:`T+1` において姿勢とそこから観測されたランドマークが追加される。したがって最適化問題は次のようになる。
+
+..
+   TODO ランドマーク数が増えているためNではない
+
+.. math::
+    \underset{\mathbf{x}_{0:T+1},\,M_{0:T}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})
+
+
+さて、このまま時刻が進むにつれて姿勢とランドマークを最適化問題に追加していくと計算コストが一気に増大してしまう。したがって古い姿勢とランドマークを最適化問題から除去する必要があるのだが、このとき単純にこれらを除去して時刻 :math:`1` からの状態について確率の最大化
+
+具体的な手法を見ていこう。
+
+.. math::
+   \underset{\mathbf{x}_{1:T+1},\,M_{0:T}}{\arg \max} \; p(\mathbf{x}_{1:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})
+
+を行うのではなく、確率モデルが維持されるように工夫を施す。これが Marginalization である。
+
+具体的な手法を見ていこう。まず最適化対象となる確率分布 :math:`p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})` をベイズ則に基づいて分解する。
+
+.. math::
+    &p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+    &= p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) p(\mathbf{x}_{1:T+1}, M_{1:T+1} | \mathbf{x}_{0}, M^{r}_{0}, \mathbf{u}_{1:T+1}, Z_{0:T+1})
+
+ここで :math:`M^{r}_{0}` は最適化対象から外されたランドマークの集合、 :math:`M_{1:T+1} = M_{0:T+1} \setminus M^{r}_{0}` は :math:`M_{0:T+1}` から :math:`M^{r}_{0}` を取り除いたものである。
+
+さて、この確率を :math:`\mathbf{x}_{0:T+1},\,M_{0:T+1}` について最大化しよう。
+
+.. math::
+    &\underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T+1} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+    &=
+    \underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \;
+    p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) p(\mathbf{x}_{1:T+1}, M_{1:T+1} | \mathbf{x}_{0}, M^{r}_{0}, \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+
+すると前提より、 :math:`p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1})` の最大値をとる :math:`\mathbf{x}_{0}, M^{r}_{0}` はすでに計算されているため、確率分布を :math:`\mathbf{x}_{1:T+1},\,M_{1:T+1}` についてのみ最大化すればよいことになる。
+
+.. math::
+    &\underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+    &=
+    \underset{\mathbf{x}_{1:T+1},\,M_{1:T+1}}{\arg \max} \;
+    p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) p(\mathbf{x}_{1:T+1}, M_{1:T+1} | \mathbf{x}_{0}, M^{r}_{0}, \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+
+これにより、確率 :math:`p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})` の最大化という問題を解いているにもかかわらず、あたかも最適化対象となる状態が :math:`\mathbf{x}_{0:T+1},\,M_{0:T+1}` から :math:`\mathbf{x}_{1:T+1},\,M_{1:T+1}` に削減されたように見える。これが Graph SLAM における Marginalization である。
+
 
 .. [#sfm] Structure from Motion と呼ばれる
-.. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},\mathbf{m}_{1:N},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`\mathbf{m}_{1:N}` としている。
+.. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
 .. [#simplify_step_times] 表記を単純化するためJacobian :math:`J_{T}` の右肩のステップ番号は省略している
