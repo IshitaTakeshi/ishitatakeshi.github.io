@@ -49,7 +49,7 @@ Graph SLAMによる姿勢推定および地図作成
 ~~~~~~~~~~~~~~~~~~~~
 
 | 確率モデルで表現してみよう。
-| 初期時刻 :math:`0` から時刻 :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T}` とする。
+| 初期時刻 :math:`0` から時刻 :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T} = \{\mathbf{m}_{j}\}` とする。
 | また、この間に得られたIMU観測値の集合を :math:`\mathbf{u}_{1:T} = \{\mathbf{u}_{1},...,\mathbf{u}_{T}\}` 、ランドマーク観測値の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までの観測可能な姿勢とランドマークの組み合わせを表している。
 | 我々の目的は、次の分布を明らかにすることである。
 
@@ -319,8 +319,8 @@ Graph SLAMによる姿勢推定および地図作成
 
 次の例を用いてJacobianの形をより具体的に見てみよう。
 
-| 姿勢を :math:`\mathbf{x}_{0:4} = \{\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3}\}` 、 ランドマークを :math:`\mathbf{m}_{1:2} = \{\mathbf{m}_{1},\mathbf{m}_{2}\}` とする。
-| また、姿勢 :math:`\{\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2}\}` からランドマーク :math:`\mathbf{m}_{0}` を、姿勢 :math:`\{\mathbf{x}_{1},\mathbf{x}_{3}\}` からランドマーク :math:`\mathbf{m}_{1}` を観測できるものとする。
+| 姿勢を :math:`\mathbf{x}_{0:3} = \{\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3}\}` 、 ランドマークを :math:`\mathbf{m}_{1:2} = \{\mathbf{m}_{1},\mathbf{m}_{2}\}` とする。
+| また、姿勢 :math:`\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2}` からランドマーク :math:`\mathbf{m}_{0}` を、姿勢 :math:`\mathbf{x}_{1},\mathbf{x}_{3}` からランドマーク :math:`\mathbf{m}_{1}` を観測できるものとする。
 
 姿勢とランドマークの関係を図で表すとこのようになる。
 
@@ -333,16 +333,16 @@ Graph SLAMによる姿勢推定および地図作成
 
 |
 
-IMU観測値 :math:`\mathbf{u}_{1:4}` およびランドマークの観測値 :math:`Z_{1:4}` はそれぞれ次のようになる。
+IMU観測値 :math:`\mathbf{u}_{1:3}` およびランドマークの観測値 :math:`Z_{1:3}` はそれぞれ次のようになる。
 
 .. math::
-    \mathbf{u}_{1:4} &= \{\mathbf{u}_{1},\mathbf{u}_{2},\mathbf{u}_{3}\}  \\
-    Z_{1:4} &= \{\mathbf{z}_{11},\mathbf{z}_{21},\mathbf{z}_{22},\mathbf{z}_{32},\mathbf{z}_{42}\}
+    \mathbf{u}_{1:3} &= \{\mathbf{u}_{1},\mathbf{u}_{2},\mathbf{u}_{3}\}  \\
+    Z_{1:3} &= \{\mathbf{z}_{11},\mathbf{z}_{21},\mathbf{z}_{22},\mathbf{z}_{32},\mathbf{z}_{42}\}
 
 これらをもとに誤差関数を構成しよう。
 
 .. math::
-   \mathbf{r}_{4}(\mathbf{y}_{4}) =
+   \mathbf{r}_{3}(\mathbf{y}_{3}) =
    \begin{bmatrix}
         \mathbf{x}_{0} - \mathbf{0} \\
         \mathbf{x}_{1} - \mathbf{g}(\mathbf{x}_{0}, \mathbf{u}_{1}) \\
@@ -356,14 +356,14 @@ IMU観測値 :math:`\mathbf{u}_{1:4}` およびランドマークの観測値 :m
     \end{bmatrix} \\
 
 .. math::
-   E_{4}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2} \;|\; \mathbf{u}_{1:4}, Z_{1:4})
-   = \mathbf{r}_{4}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2})^{\top} \Sigma_{4}^{-1} \mathbf{r}_{4}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2})
+   E_{3}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2} \;|\; \mathbf{u}_{1:3}, Z_{1:3})
+   = \mathbf{r}_{3}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2})^{\top} \Sigma_{3}^{-1} \mathbf{r}_{3}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2})
 
 
-状態を :math:`\mathbf{y}_{4} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` とすると誤差関数の微分は次のようになる。
+状態を :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` とすると誤差関数の微分は次のようになる。
 
 .. math::
-   J_{4} = \frac{\partial \mathbf{r}_{4}}{\partial \mathbf{y}_{4}} =
+   J_{3} = \frac{\partial \mathbf{r}_{3}}{\partial \mathbf{y}_{3}} =
    \begin{bmatrix}
       I         &             &             &             &             &             \\
      -G_{0}     & I           &             &             &             &             \\
@@ -499,7 +499,7 @@ SLAMのヘッシアンは要素の有無がグラフの隣接関係に対応す�
    \end{bmatrix}
 
 .. math::
-   &J_{4}^{\top} \Sigma_{4}^{-1} J_{4} \\
+   &J_{3}^{\top} \Sigma_{3}^{-1} J_{3} \\
    &=
    \begin{bmatrix}
    D_{0}                                    & -G_{0}^{\top}Q_{1}^{-1}                  &                                          &                                          & {H^{x}_{01}}^{\top}R_{01}^{-1}H^{m}_{01} &                                          \\
@@ -518,7 +518,7 @@ SLAMのヘッシアンは要素の有無がグラフの隣接関係に対応す�
    &D_{4} = {H^{m}_{01}}^{\top}R_{01}^{-1}H^{m}_{01} + {H^{m}_{11}}^{\top}R_{11}^{-1}H^{m}_{11} + {H^{m}_{21}}^{\top}R_{21}^{-1}H^{m}_{21} \\
    &D_{5} = {H^{m}_{12}}^{\top}R_{12}^{-1}H^{m}_{12} + {H^{m}_{32}}^{\top}R_{32}^{-1}H^{m}_{32} \\
 
-ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目のブロックは状態ベクトル :math:`\mathbf{y}_{4} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目のブロックは状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろうか。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列ブロックの要素および5行2列ブロックの要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列ブロックの要素および6行3列ブロックの要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
+ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目のブロックは状態ベクトル :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目のブロックは状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろうか。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列ブロックの要素および5行2列ブロックの要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列ブロックの要素および6行3列ブロックの要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
 
 Sliding window
 ~~~~~~~~~~~~~~
@@ -528,16 +528,16 @@ Sliding window
 ここではノードの追加と、推定結果全体の整合性を保ったままノードを除去する方法 "Marginalization" を解説する。
 
 Marginalization の目的
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
-さて、時刻 :math:`T` で姿勢およびランドマークの推定が終了したとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{m_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで最適な姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を求めることができる。
-しかしこれには問題がある。時刻 :math:`T+1,T+2,\;`T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、高速に姿勢およびランドマーク座標の推定を行うことができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
+さて、時刻 :math:`T` で姿勢およびランドマークの推定が終了したとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{\mathbf{m}_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで最適な姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を求めることができる。
+しかしこれには問題がある。時刻 :math:`T+1,T+2,\;`T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、高速に姿勢およびランドマーク座標を推定することができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
 計算量の増大を抑えるため、1時刻ぶんの姿勢およびランドマークを新規に追加するごとに、1時刻ぶんの古い姿勢と不必要なランドマークを削除する必要がある。このように、1時刻ごとに姿勢やランドマークの追加および削除を行う手法を Sliding Window と呼ぶ。
 
-このあと詳しく解説するが、グラフからノード(姿勢やランドマーク)を単純に削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの整合性が取れなくなってしまう。時刻 :math:`0` から最新の時刻までの全体の整合性を保ったまま Window 内にあるノードを最適する手法を Marginalization と呼ぶ。
+このあと詳しく解説するが、グラフからノード(姿勢やランドマーク)を単純に削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの最適化を行うという問題の形式が破綻してしまう。時刻 :math:`0` から最新の時刻までの状態を最適化するという問題の形式を保ったまま Window 内にあるノードを最適する手法を Marginalization と呼ぶ。
 
 Marginalization の効果
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 この問題を解消するために行うのが Marginalization というテクニックである。Marginalization は、古くなった姿勢やランドマークを最適化問題から除去するテクニックであり、次の効果がある。
 
@@ -545,7 +545,7 @@ Marginalization の効果
 2. 古くなったノードを除去しつつも、時刻 `0` から最新時刻までの全体の姿勢およびランドマークの最適化を行うという問題の整合性を保ち続けることができる
 
 Marginalization の手法
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 Marginalizationは次のような手法である。
 
@@ -557,44 +557,50 @@ Marginalizationは次のような手法である。
    TODO ランドマーク数が増えているためNではない
 
 .. math::
-    \underset{\mathbf{x}_{0:T+1},\,M_{0:T}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})
+    \underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T+1} | \mathbf{u}_{1:T+1}, Z_{0:T+1})
 
 
-さて、このまま時刻が進むにつれて姿勢とランドマークを最適化問題に追加していくと計算コストが一気に増大してしまう。したがって古い姿勢とランドマークを最適化問題から除去する必要があるのだが、このとき単純にこれらを除去して時刻 :math:`1` からの状態について確率の最大化
+さて、このまま時刻が進むにつれて姿勢とランドマークを最適化問題に追加していくと計算コストが一気に増大してしまう。そこで、Gauss-Newton法での更新において古い姿勢およびランドマークを最適化対象から外すことで、計算コストの増大を抑える。これが Marginalization である。
 
-具体的な手法を見ていこう。
+.. _extended-example-graph:
 
-.. math::
-   \underset{\mathbf{x}_{1:T+1},\,M_{0:T}}{\arg \max} \; p(\mathbf{x}_{1:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})
+.. figure:: images/marginalization.svg
+  :align: center
 
-を行うのではなく、確率モデルが維持されるように工夫を施す。これが Marginalization である。
+  新たに姿勢が追加されて大きくなったグラフ。青枠部分を更新対象の状態から外す
 
-具体的な手法を見ていこう。まず最適化対象となる確率分布 :math:`p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})` をベイズ則に基づいて分解する。
+ここでは例として、 :numref:`examplegraph` のグラフに対し時刻4において新たに姿勢 :math:`\mathbf{x}_{4}` が追加され、 :numref:`extended-example-graph` のようになったとしよう。
+状態は :math:`\mathbf{y}_{4} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{x}_{4},\mathbf{m}_{1},\mathbf{m}_{2}\right]` となる。
 
-.. math::
-    &p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
-    &= p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) p(\mathbf{x}_{1:T+1}, M_{1:T+1} | \mathbf{x}_{0}, M^{r}_{0}, \mathbf{u}_{1:T+1}, Z_{0:T+1})
-
-ここで :math:`M^{r}_{0}` は最適化対象から外されたランドマークの集合、 :math:`M_{1:T+1} = M_{0:T+1} \setminus M^{r}_{0}` は :math:`M_{0:T+1}` から :math:`M^{r}_{0}` を取り除いたものである。
-
-さて、この確率を :math:`\mathbf{x}_{0:T+1},\,M_{0:T+1}` について最大化しよう。
+残差 :math:`\mathbf{r}_{4}(\mathbf{y}_{4})` は次のようになる。
 
 .. math::
-    &\underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T+1} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
-    &=
-    \underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \;
-    p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) p(\mathbf{x}_{1:T+1}, M_{1:T+1} | \mathbf{x}_{0}, M^{r}_{0}, \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+   \mathbf{r}_{4}(\mathbf{y}_{4}) =
+   \begin{bmatrix}
+        \mathbf{x}_{0} - \mathbf{0} \\
+        \mathbf{x}_{1} - \mathbf{g}(\mathbf{x}_{0}, \mathbf{u}_{1}) \\
+        \mathbf{x}_{2} - \mathbf{g}(\mathbf{x}_{1}, \mathbf{u}_{2}) \\
+        \mathbf{x}_{3} - \mathbf{g}(\mathbf{x}_{2}, \mathbf{u}_{3}) \\
+        \mathbf{x}_{4} - \mathbf{g}(\mathbf{x}_{3}, \mathbf{u}_{4}) \\
+        \mathbf{z}_{01} - \mathbf{h}(\mathbf{x}_{0}, \mathbf{m}_{1}) \\
+        \mathbf{z}_{11} - \mathbf{h}(\mathbf{x}_{1}, \mathbf{m}_{1}) \\
+        \mathbf{z}_{21} - \mathbf{h}(\mathbf{x}_{2}, \mathbf{m}_{1}) \\
+        \mathbf{z}_{12} - \mathbf{h}(\mathbf{x}_{1}, \mathbf{m}_{2}) \\
+        \mathbf{z}_{32} - \mathbf{h}(\mathbf{x}_{3}, \mathbf{m}_{2}) \\
+        \mathbf{z}_{42} - \mathbf{h}(\mathbf{x}_{4}, \mathbf{m}_{2}) \\
+    \end{bmatrix} \\
 
-すると前提より、 :math:`p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1})` の最大値をとる :math:`\mathbf{x}_{0}, M^{r}_{0}` はすでに計算されているため、確率分布を :math:`\mathbf{x}_{1:T+1},\,M_{1:T+1}` についてのみ最大化すればよいことになる。
+このまま誤差関数を構成して最適化を行うと :math:`\mathbf{x}_{4}` が追加されたぶん計算量が増えてしまうので、marginalization により :math:`\mathbf{x}_{0}` を更新対象から外す。
+
+1. 誤差関数の並べ替え
+~~~~~~~~~~~~~~~~~~~~~
+
+Marginalization を行う際は、更新対象として維持するノードに関連する項と、更新対象から外すノードに関連する項をそれぞれまとめる必要がある。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、残差から  :math:`\mathbf{x}_{0}` に関連する項を抽出する。
 
 .. math::
-    &\underset{\mathbf{x}_{0:T+1},\,M_{0:T+1}}{\arg \max} \; p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
-    &=
-    \underset{\mathbf{x}_{1:T+1},\,M_{1:T+1}}{\arg \max} \;
-    p(\mathbf{x}_{0}, M^{r}_{0} | \mathbf{u}_{1:T+1}, Z_{0:T+1}) p(\mathbf{x}_{1:T+1}, M_{1:T+1} | \mathbf{x}_{0}, M^{r}_{0}, \mathbf{u}_{1:T+1}, Z_{0:T+1}) \\
+    \begin{bmatrix}
 
-これにより、確率 :math:`p(\mathbf{x}_{0:T+1}, M_{0:T} | \mathbf{u}_{1:T+1}, Z_{0:T+1})` の最大化という問題を解いているにもかかわらず、あたかも最適化対象となる状態が :math:`\mathbf{x}_{0:T+1},\,M_{0:T+1}` から :math:`\mathbf{x}_{1:T+1},\,M_{1:T+1}` に削減されたように見える。これが Graph SLAM における Marginalization である。
-
+    \end{bmatrix}
 
 .. [#sfm] Structure from Motion と呼ばれる
 .. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
