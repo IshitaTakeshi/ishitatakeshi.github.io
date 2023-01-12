@@ -592,16 +592,390 @@ Marginalizationは次のような手法である。
 
 このまま誤差関数を構成して最適化を行うと :math:`\mathbf{x}_{4}` が追加されたぶん計算量が増えてしまうので、marginalization により :math:`\mathbf{x}_{0}` を更新対象から外す。
 
-1. 誤差関数の並べ替え
-~~~~~~~~~~~~~~~~~~~~~
+1. 状態ベクトルと誤差関数の並べ替え
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Marginalization を行う際は、更新対象として維持するノードに関連する項と、更新対象から外すノードに関連する項をそれぞれまとめる必要がある。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、残差から  :math:`\mathbf{x}_{0}` に関連する項を抽出する。
+Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` のうち、更新対象から外す変数 :math:`\mathbf{x}_{0}` とそれ以外の変数をそれぞれまとめる必要がある。まとめる操作を行ったベクトルを :math:`\mathbf{y}^{\times}_{4}` としよう。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
+
+.. math::
+   \mathbf{y}^{\times}_{4} &= \left[\mathbf{y}^{m}_{4}, \mathbf{y}^{r}_{4}\right] \\
+   \mathbf{y}^{m}_{4} &= \mathbf{x}_{0}  \\
+   \mathbf{y}^{r}_{4} &= \left[\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{x}_{4},\mathbf{m}_{1},\mathbf{m}_{2}\right] \\
+
+もともと :math:`\mathbf{x}_{0}` が :math:`\mathbf{y}_{4}` の先頭にあるので上記の例では :math:`\mathbf{y}^{\times}_{4} = \mathbf{y}_{4}` となっているが、もしたとえば :math:`\mathbf{x}_{0}` とともに :math:`\mathbf{m}_{1}` も更新対象から外すのであれば、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
+
+.. math::
+   \mathbf{y}^{\times}_{4} &= \left[\mathbf{y}^{m}_{4}, \mathbf{y}^{r}_{4}\right] \\
+   \mathbf{y}^{m}_{4} &= \left[\mathbf{x}_{0},\mathbf{m}_{1}\right]  \\
+   \mathbf{y}^{r}_{4} &= \left[\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{x}_{4},\mathbf{m}_{2}\right] \\
+
+この場合は変数の並べ替えが必要になるため、 :math:`\mathbf{y}^{\times}_{4} \neq \mathbf{y}_{4}` である。
+
+2. Gauss-Newton更新式の計算
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+さて、並べ替えられた誤差関数 :math:`\mathbf{y}^{\times}_{4}` を用いてGauss-Newton法の更新式を計算してみよう。
+
+まず Jacobian を計算する。
+
+.. math::
+   J^{\times}_{4}
+   = \frac{\partial \mathbf{r}_{4}}{\partial \mathbf{y}^{\times}_{4}}
+   = \frac{\partial \mathbf{r}_{4}}{\partial \left[\mathbf{y}^{m}_{4}, \mathbf{y}^{r}_{4}\right]}
+   =
+   \begin{bmatrix}
+    \frac{\partial \mathbf{r}_{4}}{\partial \mathbf{y}^{m}_{4}} &
+    \frac{\partial \mathbf{r}_{4}}{\partial \mathbf{y}^{r}_{4}}
+   \end{bmatrix}
+   =
+   \begin{bmatrix}
+       J^{m}_{4} & J^{r}_{4}
+   \end{bmatrix}
+
+ヘッシアンを計算してみよう。
+
+.. math::
+    {J^{\times}_{4}}^{\top}J^{\times}_{4}
+    &=
+    \begin{bmatrix}
+        {J^{m}_{4}}^{\top} \\
+        {J^{r}_{4}}^{\top}
+    \end{bmatrix}
+    \Sigma_{4}^{-1}
+    \begin{bmatrix}
+        J^{m}_{4} &
+        J^{r}_{4}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        {J^{m}_{4}}^{\top}\Sigma_{4}^{-1}J^{m}_{4} & {J^{m}_{4}}^{\top}\Sigma_{4}^{-1}J^{r}_{4} \\
+        {J^{r}_{4}}^{\top}\Sigma_{4}^{-1}J^{m}_{4} & {J^{r}_{4}}^{\top}\Sigma_{4}^{-1}J^{r}_{4}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}
+
+:math:`-{J^{\times}_{4}}^{\top}\Sigma_{4}^{-1}\mathbf{r}_{4}` を計算し、これを :math:`\left[\mathbf{b}^{m}_{4}, \mathbf{b}^{r}_{4}\right]` とおくことにしよう。
+
+.. math::
+    -{J^{\times}_{4}}^{\top}\Sigma_{4}^{-1}\mathbf{r}_{4}
+    &=
+    -
+    \begin{bmatrix}
+        {J^{m}_{4}}^{\top} \\
+        {J^{r}_{4}}^{\top}
+    \end{bmatrix}
+    \Sigma_{4}^{-1}
+    \mathbf{r}_{4} \\
+    &=
+    \begin{bmatrix}
+        -{J^{m}_{4}}^{\top}\Sigma_{4}^{-1}\mathbf{r}_{4} \\
+        -{J^{r}_{4}}^{\top}\Sigma_{4}^{-1}\mathbf{r}_{4}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix}
+
+これらを用いると、式 :eq:`gauss-newton-update` により、Gauss-Newton法の更新量 :math:`\left[\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4} \right]` が計算できる。
 
 .. math::
     \begin{bmatrix}
-
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
     \end{bmatrix}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix}
+
+.. math::
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}^{-1}
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix}
+
+しかし、これでは :math:`\mathbf{y}^{m}_{4} = \mathbf{x}_{0}` を更新対象から外して計算量を削減するという本来の目的を達成できない。
+
+3. Marginalizationによる計算量削減
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+我々はもはや :math:`\mathbf{y}^{m}_{4} = \mathbf{x}^{0}` を更新しない。 :math:`\mathbf{y}^{r}_{4}` さえ更新できればよい。計算量を削減するため、 :math:`\Delta \mathbf{y}^{m}_{4}` を計算することなく、 :math:`\Delta \mathbf{y}^{r}_{4}` のみを得たい。これを実現するにはどうすればよいだろうか。
+
+じつは両辺に
+
+.. math::
+    \begin{bmatrix}
+        I & 0 \\
+        -H^{rm}_{4}{H^{mm}_{4}}^{-1} & I \\
+    \end{bmatrix}
+
+という行列をかけると、これを実現できる。実際に計算してみよう。
+
+.. math::
+    \begin{bmatrix}
+        I & 0 \\
+        -H^{rm}_{4}{H^{mm}_{4}}^{-1} & I \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    &=
+    \begin{bmatrix}
+        I & 0 \\
+        -H^{rm}_{4}{H^{mm}_{4}}^{-1} & I \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix} \\
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        0 & H^{rr}_{4}-H^{rm}_{4}{H^{mm}_{4}}^{-1}H^{mr}_{4}
+    \end{bmatrix}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    &=
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}-H^{rm}_{4}{H^{mm}_{4}}^{-1}\mathbf{b}^{m}_{4}
+    \end{bmatrix}
+
+計算の結果、2本の式が得られた。
+
+.. math::
+    \left[ H^{rr}_{4}-H^{rm}_{4}{H^{mm}_{4}}^{-1}H^{mr}_{4} \right] \Delta \mathbf{y}^{r}_{4} = \mathbf{b}^{r}_{4} - H^{rm}_{4}{H^{mm}_{4}}^{-1}\mathbf{b}^{m}_{4}
+    :label: update-delta-y-r
+
+.. math::
+    H^{mm}_{4} \Delta \mathbf{y}^{m}_{4} = \mathbf{b}^{m}_{4} - H^{mr}_{4} \Delta \mathbf{y}^{r}_{4} \\
+    :label: update-delta-y-m
+
+式 :eq:`update-delta-y-r` について、 :math:`\tilde{H}_{4}` と :math:`\tilde{\mathbf{b}}_{4}` を次のように定めれば、更新量 :math:`\Delta \mathbf{y}^{r}_{4}` が計算できる。
+
+.. math::
+    \tilde{H}_{4} &= H^{rr}_{4}-H^{rm}_{4}{H^{mm}_{4}}^{-1}H^{mr}_{4} \\
+    \tilde{\mathbf{b}}_{4} &= \mathbf{b}^{r}_{4} - H^{rm}_{4}{H^{mm}_{4}}^{-1}\mathbf{b}^{m}_{4}
+
+.. math::
+    \Delta \mathbf{y}^{r}_{4} = \tilde{H}_{4}^{-1}\tilde{\mathbf{b}}_{4}
+    :label: marginalized-update
+
+:math:`\tilde{H}_{4}` と :math:`\tilde{\mathbf{b}}_{4}` のいずれも :math:`\Delta \mathbf{y}^{m}_{4}` に依存しないため、更新式 :eq:`marginalized-update` を用いると :math:`\Delta \mathbf{y}^{m}_{4}` を計算することなく  :math:`\Delta \mathbf{y}^{r}_{4}` を計算することができる。また、 :math:`\tilde{H}_{4}` と :math:`\tilde{\mathbf{b}}_{4}` は :math:`\Delta \mathbf{y}^{r}_{4}` と同じサイズなので、 :math:`\mathbf{y}^{m}_{4} = \mathbf{x}^{0}` を更新対象から外したぶんの計算量が削減できている。
+
+なお、式 :eq:`update-delta-y-m` の両辺に :math:`{H^{mm}_{4}}^{-1}` をかければ :math:`\Delta \mathbf{y}^{m}_{4}` を計算することができるが、 :math:`\mathbf{y}^{m}_{4}` は更新対象から外されているため、 :math:`\Delta \mathbf{y}^{m}_{4}` は計算しなくてよい。
+
+コラム：なぜ marginalization と呼ばれるのか
+-------------------------------------------
+
+Marginalization とは日本語で「(確率分布の)周辺化」を意味するのだが、これのいったいどこが周辺化になっているのだろうか。
+:math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` を正規分布に従う確率変数とみなすとこの答えが見えてくる。
+
+正規分布の information form による表現
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+正規分布には information form (もしくは canonical form) と呼ばれる表現方法がある。これは次のようなものである。
+
+変数 :math:`\mathbf{x}` が従う正規分布 :math:`\mathcal{N}(\mathbf{\mu}, \Sigma)` について指数部分に着目し、式を変形していく。
+
+.. math::
+    \mathcal{N}(\mathbf{\mu}, \Sigma)
+    &\propto \exp(-\frac{1}{2}(\mathbf{x} - \mathbf{\mu})^{\top}\Sigma^{-1}(\mathbf{x} - \mathbf{\mu})) \\
+    &= \exp(-\frac{1}{2}\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} + \mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{x} - \frac{1}{2}\mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{\mu})
+
+:math:`\mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{\mu}` は定数なので比例関係に含めることができる。
+
+.. math::
+    \mathcal{N}(\mathbf{x} | \mathbf{\mu}, \Sigma)
+    \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} + \mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{x})
+
+:math:`\mathbf{\eta} = \mathbf{\mu}^{\top}\Sigma^{-1}, \Lambda = \Sigma^{-1}` とおけば、全く同じ正規分布を異なるパラメータで表現できる。これが正規分布の information form である。通常これは :math:`\mathcal{N}^{-1}(\mathbf{\eta},  \Lambda)` と表記される。
+
+.. math::
+   \mathcal{N}^{-1}(\mathbf{\eta},  \Lambda) \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Lambda\mathbf{x} + \mathbf{\eta}^{\top}\mathbf{x})
+
+更新量を確率変数とみなす
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+更新量 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` を確率変数とみなし、計算に使った行列 :math:`\begin{bmatrix} H^{mm}_{4} & H^{mr}_{4} \\ H^{rm}_{4} & H^{rr}_{4} \end{bmatrix}, \begin{bmatrix} \mathbf{b}^{m}_{4} \\ \mathbf{b}^{r}_{4} \end{bmatrix}` をパラメータとするの正規分布に従うと考える。
+
+.. math::
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix} \sim
+    \mathcal{N}^{-1}\left(
+        \begin{bmatrix}
+            \mathbf{b}^{m}_{4} \\
+            \mathbf{b}^{r}_{4}
+        \end{bmatrix},
+        \begin{bmatrix}
+            H^{mm}_{4} & H^{mr}_{4} \\
+            H^{rm}_{4} & H^{rr}_{4} \\
+        \end{bmatrix}
+    \right)\\
+    :label: canonical-delta-y4-distribution
+
+じつは更新量 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` の計算はこの確率の最大化に対応している。実際にやってみよう。
+
+まずは分布を書き下してみる。
+
+.. math::
+    &\mathcal{N}^{-1}\left(
+        \begin{bmatrix}
+            \mathbf{b}^{m}_{4} \\
+            \mathbf{b}^{r}_{4}
+        \end{bmatrix},
+        \begin{bmatrix}
+            H^{mm}_{4} & H^{mr}_{4} \\
+            H^{rm}_{4} & H^{rr}_{4} \\
+        \end{bmatrix}
+    \right)\\
+    &\propto \exp\left(
+    -\frac{1}{2}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}^{\top}
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix}^{\top}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}\right)
+
+指数関数は単調増加なので、指数部分の中身だけに着目すればよい。
+
+.. math::
+    &\underset{\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}}{\arg \max} \;
+    \mathcal{N}^{-1}\left(
+        \begin{bmatrix}
+            \mathbf{b}^{m}_{4} \\
+            \mathbf{b}^{r}_{4}
+        \end{bmatrix},
+        \begin{bmatrix}
+            H^{mm}_{4} & H^{mr}_{4} \\
+            H^{rm}_{4} & H^{rr}_{4} \\
+        \end{bmatrix}
+    \right)\\
+    &=
+    \underset{\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}}{\arg \max}
+    \left(
+    -\frac{1}{2}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}^{\top}
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix}^{\top}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}\right)
+
+あとは :math:`\left[\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}\right]` で微分して :math:`\mathbf{0}` とおけば、確率を最大化する :math:`\left[\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}\right]` が得られる。
+
+.. math::
+    -
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix} = \mathbf{0},\\
+    \begin{bmatrix}
+        \Delta \mathbf{y}^{m}_{4} \\
+        \Delta \mathbf{y}^{r}_{4}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        H^{mm}_{4} & H^{mr}_{4} \\
+        H^{rm}_{4} & H^{rr}_{4} \\
+    \end{bmatrix}^{-1}
+    \begin{bmatrix}
+        \mathbf{b}^{m}_{4} \\
+        \mathbf{b}^{r}_{4}
+    \end{bmatrix}
+
+Marginalization と Conditioning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+じつは式 :eq:`canonical-delta-y4-distribution` で示される分布の :math:`\Delta \mathbf{y}^{r}_{4}` についての周辺分布は次の式で表せることが知られている。
+
+.. math::
+    \Delta \mathbf{y}^{r}_{4} \sim \mathcal{N}^{-1}\left(
+        \mathbf{b}^{r}_{4} - H^{rm}_{4}{H^{mm}_{4}}^{-1}\mathbf{b}^{m}_{4},\;
+        H^{rr}_{4}-H^{rm}_{4}{H^{mm}_{4}}^{-1}H^{mr}_{4}
+    \right) \\
+   :label: marginalized-y-r-4-distribution
+
+
+さらに、 :math:`\Delta \mathbf{y}^{r}_{4}` で条件づけされた :math:`\Delta \mathbf{y}^{m}_{4}` の分布は次のように表される [#prml-conditional-marginal]_ 。
+
+.. math::
+    \Delta \mathbf{y}^{m}_{4} | \Delta \mathbf{y}^{r}_{4} \sim \mathcal{N}^{-1}\left(
+        \mathbf{b}^{m}_{4} - H^{mr}_{4} \Delta \mathbf{y}^{r}_{4},\;
+        H^{mm}_{4}
+    \right)
+    :label: conditional-y-m-4-given-y-r-4-distribution
+
+先ほど information form の正規分布のパラメータで線型方程式を作り、それを解くことが確率の最大化に対応することを示した。
+
+式 :eq:`update-delta-y-r` :eq:`update-delta-y-m` を見ると、これはまさにそれぞれ :eq:`marginalized-y-r-4-distribution` :eq:`conditional-y-m-4-given-y-r-4-distribution` で表される分布の最大化に対応していることがおわかりいただけるだろう。
 
 .. [#sfm] Structure from Motion と呼ばれる
 .. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
-.. [#simplify_step_times] 表記を単純化するためJacobian :math:`J_{T}` の右肩のステップ番号は省略している
+.. [#prml-conditional-marginal] Bishop, Christopher M., and Nasser M. Nasrabadi. Pattern recognition and machine learning. Vol. 4. No. 4. New York: springer, 2006. pp. 85-90.
