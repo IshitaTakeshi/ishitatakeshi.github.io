@@ -1,19 +1,35 @@
-Graph SLAM
-==========
+Graph SLAMの導出
+================
 
 Graph SLAMとは
 --------------
 
 Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法である。
-カメラ姿勢をノードで表現すると、異なる2時刻の姿勢関係をそれらのノードをつなぐエッジで表現することができる。
-ランドマークもノードで表現することができる。これにより、ランドマークとカメラ姿勢の関係をこれらをつなぐエッジで表現することができる。
 
-確率モデルによる表現
-~~~~~~~~~~~~~~~~~~~~
+.. _motion-and-observation:
 
-| 確率モデルで表現してみよう。
-| 初期時刻 :math:`0` から時刻 :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T} = \{\mathbf{m}_{j}\}` とする。
-| また、この間に得られたIMU観測値の集合を :math:`\mathbf{u}_{1:T} = \{\mathbf{u}_{1},...,\mathbf{u}_{T}\}` 、ランドマーク観測値の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までの観測可能な姿勢とランドマークの組み合わせを表している。
+.. figure:: images/motion-and-observation.svg
+
+   SLAMは周囲の観測情報(橙色)と運動情報(青色)を用いてセンサ姿勢を推定する。
+
+センサ姿勢をノードで表現すると、異なる2時刻間の姿勢関係をそれらノードをつなぐエッジで表現することができる。ランドマークも同様にノードで表現することができる。これにより、ランドマークとセンサ姿勢の関係をこれらをつなぐエッジで表現することができる。
+たとえば :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現すると :numref:`homeomorphic-graph` のようになる。
+
+.. _homeomorphic-graph:
+
+.. figure:: images/homeomorphic-graph.svg
+
+    :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現したもの
+
+今回は運動センサとしてIMUを、観測センサとしてカメラを用いることとし、Graph SLAMを確率モデルから導出する。
+
+SLAMの確率モデルによる表現
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| まずはSLAMの問題を確率モデルで表現することから始める。
+| 初期時刻 :math:`0` から :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T} = \{\mathbf{m}_{1},...,\mathbf{m}_{N_{T}}\}` とする。
+| 時刻 :math:`0` から :math:`T` の間に得られたIMU観測値の集合を :math:`\mathbf{u}_{1:T} = \{\mathbf{u}_{1},...,\mathbf{u}_{T}\}` とする。たとえば :math:`\mathbf{u}_{1}` は時刻 :math:`0` から :math:`1` の間に得られたIMU観測値を表している。
+| ランドマーク観測値の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までのセンサ姿勢とそこから観測可能なランドマークの組み合わせを表している。
 | 我々の目的は、次の分布を明らかにすることである。
 
 .. math::
@@ -25,8 +41,7 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
 状態分布の再帰的推定法の導出
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| すべての観測値から姿勢およびランドマークの分布 :eq:`fullslamposterior` を高精度に求める手法 [#sfm]_ は存在するものの、計算コストが高い。一般的にSLAMは高速に動作することを求められるため、ある事前情報をたよりにして、特定時刻の状態を求めることが一般的である。
-| ここでは時刻 :math:`T-1` の状態をたよりにして時刻 :math:`T` の状態を求める確率モデルを導出する。
+SLAMは高速に動作することが求められるため、ある事前情報をたよりにして特定時刻の状態を求めることが一般的である。ここでは時刻 :math:`T-1` の状態をたよりにして時刻 :math:`T` の状態を求める確率モデルを導出する。
 
 | まずはベイズの定理に従って :eq:`fullslamposterior` を分解する。
 
@@ -35,12 +50,15 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
    &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
    :label: factored-posterior
 
-ここで :math:`\eta_{T}` は次で計算される定数である。 :math:`\eta_{T}` は観測値 :math:`\mathbf{u}_{1:T},Z_{0:T}` の確率分布のみで構成されているため、一度これらが観測されてしまえば :math:`\eta_{T}` は変化しない。したがって姿勢推定の問題では :math:`\eta_{T}` は定数として扱うことができる。
+| :math:`Z_{T}` は時刻 :math:`T` に観測できるランドマークの集合である。
+| :math:`\eta_{T}` は次で計算される定数である。
 
 .. math::
     \eta_{T} = \frac{p(\mathbf{u}_{1:T},Z_{0:T-1})}{p(\mathbf{u}_{1:T},Z_{0:T})}
 
-| さて、 :math:`Z_{T}` は時刻 :math:`T` に得られたランドマークの観測値だが、 :math:`Z_{T}` の分布は同時刻の姿勢 :math:`\mathbf{x}_{T}` およびそこで観測できるランドマークの座標 :math:`M_{0:T}` にしか依存しない。これは時刻 :math:`i` から観測された :math:`j` 番目のランドマーク :math:`\mathbf{z}_{ij}` を :math:`\mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})` でモデル化するためである。したがって、 :math:`Z_{T}` の確率分布を次のように単純化できる [#simplify_z_distribution]_ 。
+:math:`\eta_{T}` は観測値 :math:`\mathbf{u}_{1:T},Z_{0:T}` の確率分布のみで構成されているため、いったん観測値が得られてしまえば :math:`\eta_{T}` は変化しない。したがって姿勢推定の問題では :math:`\eta_{T}` は定数として扱うことができる。
+
+| :math:`Z_{T}` の分布を見てみよう。:math:`Z_{T}` の分布は時刻 :math:`T` のカメラ姿勢と時刻 :math:`T` に観測できるランドマークの座標にしか依存しない。たとえば、時刻 :math:`T` のカメラ姿勢やそこから観測できるランドマーク位置が変化すれば、カメラに映るランドマークの像 :math:`Z_{T}` は変化する。一方で、時刻 :math:`T` におけるIMU観測値がどうであろうと、その値はカメラに映るランドマークの像になんら直接的変化を及ぼさない。これにより、 :math:`Z_{T}` の確率分布を次のように単純化できる [#simplify_z_distribution]_ 。
 
 .. math::
     p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T})
@@ -53,7 +71,7 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
     &= p(\mathbf{x}_{T}\;|\;\mathbf{x}_{0:T-1},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})\;
       p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1})
 
-我々は時刻 :math:`T` の姿勢 :math:`\mathbf{x}_{T}` をオドメトリ推定モデル :math:`\mathbf{g}(\mathbf{x}_{T-1}, \mathbf{u}_{T})` で予測する。したがって先ほどと同様の議論により、次のような簡略化を行うことができる。
+計算の簡略化のため、時刻 :math:`T` の姿勢 :math:`\mathbf{x}_{T}` が1時刻前の姿勢 :math:`\mathbf{x}_{T-1}` と時刻 :math:`T-1` から :math:`T` までに得られるIMU観測値 :math:`\mathbf{u}_{T}` のみを用いて予測できると仮定する。したがって先ほどと同様の議論により、次のような簡略化を行うことができる。
 
 .. math::
     &p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
@@ -63,11 +81,18 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
     &=
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
     p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+
+:math:`\mathbf{x}_{T-1}` までの姿勢を予測するためには時刻 :math:`T-1` までのIMU観測値があれば十分なので、 :math:`\mathbf{u}_{T}` を条件から除外することができる。
+また、時刻 :math:`0` から :math:`T-1` までに観測できるランドマークの集合は :math:`M_{0:T-1}` なので、これも修正する。
+
+.. math::
+    &p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
     &=
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
-    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
-
-最後の変形は、 :math:`\mathbf{x}_{T-1}` までの姿勢を予測するためには時刻 :math:`T-1` までのIMU観測値があれば十分であることを表している。
+    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+    &=
+    p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
+    p(\mathbf{x}_{0:T-1},M_{0:T-1}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1})
 
 これらを総合して式 :eq:`factored-posterior` を再構成すると、時刻 :math:`T-1` における状態分布から時刻 :math:`T` の状態分布を得る式を導くことができる。
 
@@ -77,9 +102,10 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
    &= \eta_{T} \;
     p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T}) \;
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
-    p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
+    p(\mathbf{x}_{0:T-1},M_{0:T-1}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1}) \\
+   :label: prediction-from-previous
 
-ある時刻の分布はその前の時刻の分布がわかれば導くことができる。これを繰り返していくと次のようになる。
+式 :eq:`prediction-from-previous` は時刻 :math:`T` における状態分布 :math:`p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})` を時刻 :math:`T-1` の状態分布 :math:`p(\mathbf{x}_{0:T-1},M_{0:T-1}\;|\;\mathbf{u}_{1:T-1},Z_{0:T-1})` から推定する方法を示している。これを再帰的に繰り返していくと次のようになる。
 
 .. math::
    \begin{align}
@@ -87,23 +113,24 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
    = \;
     & \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T}) \; p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T}) \; \\
     & ... \\
-    & \eta_{2} \; p(Z_{2}\;|\;\mathbf{x}_{2},M_{0:T}) \; p(\mathbf{x}_{2}\;|\;\mathbf{x}_{1},\mathbf{u}_{2}) \; \\
-    & \eta_{1} \; p(Z_{1}\;|\;\mathbf{x}_{1},M_{0:T}) \; p(\mathbf{x}_{1}\;|\;\mathbf{x}_{0},\mathbf{u}_{1}) \; p(\mathbf{x}_{0}) \\
+    & \eta_{2} \; p(Z_{2}\;|\;\mathbf{x}_{2},M_{0:2}) \; p(\mathbf{x}_{2}\;|\;\mathbf{x}_{1},\mathbf{u}_{2}) \; \\
+    & \eta_{1} \; p(Z_{1}\;|\;\mathbf{x}_{1},M_{0:1}) \; p(\mathbf{x}_{1}\;|\;\mathbf{x}_{0},\mathbf{u}_{1}) \; p(\mathbf{x}_{0}) \\
    =\;
-    &\eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[p(Z_{i}\;|\;\mathbf{x}_{i},M_{0:T}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i})\right] \\
+    &\eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[ p(Z_{i}\;|\;\mathbf{x}_{i},M_{0:i}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i}) \right] \\
     &\text{where}\quad \eta_{1:T} = \prod_{i=1}^{T} \eta_{i}
    \end{align}
+   :label: recursive-decomposition
 
-この式では時刻 :math:`0` における姿勢の分布を :math:`p(\mathbf{x}_{0})` と置いている。一般的に :math:`\mathbf{x}_{0}` は推定するものではなく基準座標として任意に定めるものであるため、このように置くことができる。ここでは時刻 :math:`0` においてランドマークの座標は全く不明であると仮定しているが、もし何らかの方法でランドマーク座標の分布を事前に得られるのであれば、時刻 :math:`0` の状態分布は :math:`p(\mathbf{x}_{0}, M_{0:T})` のようになるであろう。
+この式では時刻 :math:`0` における姿勢の分布を :math:`p(\mathbf{x}_{0})` としている。一般的に :math:`\mathbf{x}_{0}` は推定するものではなく基準座標として任意に定めるものであるため、このようにおくことができる。
 
-一般的なSLAMの問題ではすべてのランドマークをすべての姿勢から観測できるわけではないため、この仮定を踏まえて上記の式をさらに具体的に次のように書くことができる。
+一般的なSLAMの問題では時刻 :math:`i` までに観測されるすべてのランドマーク :math:`M_{0:i}` を時刻 :math:`T` までのすべての姿勢 :math:`\mathbf{x}_{0:i}` から観測できるわけではない。これを踏まえて式 :eq:`recursive-decomposition` をさらに具体的に次のように書くことができる。
 
 .. math::
    &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
    &=
-    \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[p(Z_{i}\;|\;\mathbf{x}_{i},M_{0:T}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i})\right] \\
+    \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{i=1}^{T} \left[ p(Z_{i}\;|\;\mathbf{x}_{i},M_{0:i}) \; p(\mathbf{x}_{i}\;|\;\mathbf{x}_{i-1},\mathbf{u}_{i}) \right] \\
    &=
-    \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{k=1}^{T} p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}) \prod_{(i,j)\in S_{0:T}} p(\mathbf{z}_{ij}\;|\;\mathbf{x}_{i},\mathbf{m}_{j})
+    \eta_{1:T} \; p(\mathbf{x}_{0})\; \prod_{(i,j)\in S_{0:T}} p(\mathbf{z}_{ij}\;|\;\mathbf{x}_{i},\mathbf{m}_{j}) \prod_{k=1}^{T} p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k})
    :label: posterior-decomposition
 
 このようにして、 状態分布を推定する問題を、
@@ -124,21 +151,6 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
 
 これによって初期姿勢が :math:`\mathbf{0}` に拘束される。
 
-運動モデルによる予測
-~~~~~~~~~~~~~~~~~~~~
-
-式 :eq:`posterior-decomposition` において、 :math:`p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k})` は、前の時刻の姿勢 :math:`\mathbf{x}_{k-1}` および前の時刻から現在時刻までのIMU観測値 :math:`\mathbf{u}_{k}` に基づいた現在の姿勢の予測を表現している。なお、センサ構成によっては :math:`\mathbf{u}_{k}` をアクセルへの入力値や車輪の回転数などとすることもある。
-
-時刻 :math:`k` の姿勢 :math:`\mathbf{x}_{k}` に対して運動モデルの予測 :math:`\mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})` の誤差が分散 :math:`Q_{k} \in \mathbb{R}^{6 \times 6}` の正規分布に従うとすると、この分布は
-
-.. math::
-    p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}) =
-    \frac{1}{\sqrt{(2\pi)^{6} \det(Q_{k})}}
-    \exp(-\frac{1}{2}
-    \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})\right]^{\top} Q_{k}^{-1} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})\right])
-
-と記述することができる。
-
 観測モデルによる予測
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -151,6 +163,20 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
 
 なお、共分散 :math:`Q_{k}` および :math:`R_{ij}` はハイパーパラメータとして与えることもできるが、統計的に計算することも可能である。
 
+運動モデルによる予測
+~~~~~~~~~~~~~~~~~~~~
+
+式 :eq:`posterior-decomposition` において、 :math:`p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k})` は、前の時刻の姿勢 :math:`\mathbf{x}_{k-1}` および前の時刻から現在時刻までのIMU観測値 :math:`\mathbf{u}_{k}` に基づいた現在の姿勢の予測を表現している。
+
+時刻 :math:`k` の姿勢 :math:`\mathbf{x}_{k}` に対して運動モデルの予測 :math:`\mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})` の誤差が分散 :math:`Q_{k} \in \mathbb{R}^{6 \times 6}` の正規分布に従うとすると、この分布は
+
+.. math::
+    p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}) =
+    \frac{1}{\sqrt{(2\pi)^{6} \det(Q_{k})}}
+    \exp(-\frac{1}{2}
+    \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})\right]^{\top} Q_{k}^{-1} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})\right])
+
+と記述することができる。
 
 対数尤度関数
 ~~~~~~~~~~~~
@@ -169,13 +195,13 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
    =\;
    &\text{constant}
    + \log p(\mathbf{x}_{0})
-   + \sum_{k=1}^{T} \log p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k})
-   + \sum_{(i,j)\in S_{0:T}} \log p(\mathbf{z}_{ij}\;|\;\mathbf{x}_{i},\mathbf{m}_{j}) \\
+   + \sum_{(i,j)\in S_{0:T}} \log p(\mathbf{z}_{ij}\;|\;\mathbf{x}_{i},\mathbf{m}_{j})
+   + \sum_{k=1}^{T} \log p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}) \\
    =\;
    &\text{constant} \\
    &- \frac{1}{2}\mathbf{x}_{0}^{\top}Q_{0}^{-1}\mathbf{x}_{0} \\
+   &- \frac{1}{2} \sum_{(i,j)\in S_{0:T}} \left[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})\right]^{\top}R_{ij}^{-1}\left[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})\right] \\
    &- \frac{1}{2} \sum_{k=1}^{T} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1},\mathbf{u}_{k})\right]^{\top} Q_{k}^{-1} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1},\mathbf{u}_{k})\right] \\
-   &- \frac{1}{2} \sum_{(i,j)\in S_{0:T}} \left[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})\right]^{\top}R_{ij}^{-1}\left[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i},\mathbf{m}_{j})\right]
 
 対数関数は単調増加関数なので、もとの確率分布を最大化する状態と、対数関数を適用したあとの確率分布を最大化する状態は等しい。
 
@@ -939,6 +965,5 @@ Marginalization と Conditioning
 
 式 :eq:`update-delta-y-r` :eq:`update-delta-y-m` を見ると、これはまさにそれぞれ :eq:`marginalized-y-r-4-distribution` :eq:`conditional-y-m-4-given-y-r-4-distribution` で表される分布の最大化に対応していることがおわかりいただけるだろう。
 
-.. [#sfm] Structure from Motion と呼ばれる
 .. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
 .. [#prml-conditional-marginal] Bishop, Christopher M., and Nasser M. Nasrabadi. Pattern recognition and machine learning. Vol. 4. No. 4. New York: springer, 2006. pp. 85-90.
