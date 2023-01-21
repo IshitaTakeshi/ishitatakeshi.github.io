@@ -8,43 +8,6 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
 カメラ姿勢をノードで表現すると、異なる2時刻の姿勢関係をそれらのノードをつなぐエッジで表現することができる。
 ランドマークもノードで表現することができる。これにより、ランドマークとカメラ姿勢の関係をこれらをつなぐエッジで表現することができる。
 
-
-注釈
-~~~~
-
-今回は Visual Inertial SLAM を例として確率モデルを記述するが、IMU観測値をたとえば車両への制御入力などに置き換えれば、他のセンサー入力を対象としたSLAMにも応用できる。
-
-運動モデル
-~~~~~~~~~~
-
-観測モデル
-~~~~~~~~~~
-
-Graph SLAMによる姿勢推定および地図作成
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-| Graph SLAM ではグラフの各エッジに誤差関数を対応させ、すべてのエッジの誤差関数の総和を最小化することで最適な姿勢とランドマーク座標を求める。
-| たとえば時刻 :math:`i` の姿勢を :math:`\mathbf{x}_{i} \in \mathbb{R}^{6}` とし、 :math:`i` から  :math:`i+1` までのIMU観測値 :math:`\mathbf{u}_{i+1} \in \mathbb{R}^{9}` および運動モデル :math:`\mathbf{g}(\mathbf{x}_{i}, \mathbf{u}_{i+1})` を用いて運動モデルに関する誤差
-
-.. math::
-    [\mathbf{x}_{i+1} - \mathbf{g}(\mathbf{x}_{i}, \mathbf{u}_{i+1})]^{\top}Q_{k}^{-1}[\mathbf{x}_{i+1} - \mathbf{g}(\mathbf{x}_{i}, \mathbf{u}_{i+1})]
-
-を構成することができる。ここで :math:`Q_{k}` は誤差の共分散を表す行列である。この誤差 :math:`\mathbf{x}_{i}` と  :math:`\mathbf{x}_{i+1}` の間のエッジに対応させる。
-
-
-また、 :math:`j` 番目のランドマークを :math:`\mathbf{m}_{j}` 、 :math:`i` 番目の姿勢における :math:`j` 番目のランドマークの観測値を :math:`\mathbf{z}_{ij}` とし、観測モデルを :math:`\mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j})` とする。
-具体的には、たとえばランドマーク :math:`\mathbf{m}_{j}` は物体の3次元座標、ランドマークの観測値 :math:`\mathbf{z}_{ij}` は画像特徴点、観測モデル :math:`\mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j})` は透視投影モデルに置き換えることができる。
-
-これらを用いて再投影誤差
-
-.. math::
-    [\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j})]^{\top}R_{ij}^{-1}[\mathbf{z}_{ij} - \mathbf{h}(\mathbf{x}_{i}, \mathbf{m}_{j})]
-
-を計算することができる。これを :math:`\mathbf{x}_{i}` と  :math:`\mathbf{m}_{j}` の間のエッジに対応させる。
-
-これら誤差関数の総和を最小化するエッジの値 :math:`\left\{\mathbf{x}^{*}_{0}, \mathbf{x}^{*}_{1}, \mathbf{x}^{*}_{2}, \mathbf{x}^{*}_{3}, \mathbf{x}^{*}_{4}, \mathbf{m}^{*}_{1}, \mathbf{m}^{*}_{2}\right\}` を求める。これが Graph SLAM による姿勢推定および地図作成の問題である。
-
-
 確率モデルによる表現
 ~~~~~~~~~~~~~~~~~~~~
 
