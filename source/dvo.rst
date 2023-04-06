@@ -236,7 +236,7 @@ warping関数を近似する．
     &=  \frac{\partial I_{t_{1}}(\mathbf{x}_{i})}{\partial \mathbf{x}}
         \cdot \frac{\partial \mathbf{\pi}(g(G(t_{0}, \mathbf{p}_{i})))}{\partial g}
         \cdot \frac{\partial g(G(t_{0}, \mathbf{p}_{i}))}{\partial \mathrm{stack}(G)}
-        \cdot J_{G} \cdot \pose \\
+        \cdot J_{G} \\
     y_{i}
     &= -\left[ I_{t_{1}}(\mathbf{x}_{i}) - I_{t_{0}}(\mathbf{x}_{i}) \right]
     \end{align}
