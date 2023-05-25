@@ -27,7 +27,7 @@ SLAMの確率モデルによる表現
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 | まずはSLAMの問題を確率モデルで表現することから始める。
-| 初期時刻 :math:`0` から :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{1},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T} = \{\mathbf{m}_{1},...,\mathbf{m}_{N_{T}}\}` とする。
+| 初期時刻 :math:`0` から :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{0},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T} = \{\mathbf{m}_{1},...,\mathbf{m}_{N_{T}}\}` とする。
 | 時刻 :math:`0` から :math:`T` の間に得られたIMU観測値の集合を :math:`\mathbf{u}_{1:T} = \{\mathbf{u}_{1},...,\mathbf{u}_{T}\}` とする。たとえば :math:`\mathbf{u}_{1}` は時刻 :math:`0` から :math:`1` の間に得られたIMU観測値を表している。
 | ランドマーク観測値の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までのセンサ姿勢とそこから観測可能なランドマークの組み合わせを表している。
 | 我々の目的は、次の分布を明らかにすることである。
@@ -216,6 +216,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
     &= \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; -E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
     &= \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\min}\; E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}), \\
     \\
+    \text{where} \;\;
     E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
     &= \mathbf{x}_{0}^{\top}Q_{0}^{-1}\mathbf{x}_{0} \\
     &+ \sum_{k=1}^{T} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1},\mathbf{u}_{k})\right]^{\top} Q_{k}^{-1} \left[\mathbf{x}_{k} - \mathbf{g}(\mathbf{x}_{k-1},\mathbf{u}_{k})\right] \\
@@ -381,7 +382,7 @@ Gauss-Newton法ではまず初期値 :math:`\mathbf{y}_{T}^{(0)}` を定め、�
    \mathbf{r}_{T}(\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)})^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)})
 
 | この問題は解析的に解けないため、誤差関数を近似し、それを最小化する状態 :math:`\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}` を求める。
-| まずは残差 :math:`\mathbf{r}_{T}` を近似する。
+| 残差 :math:`\mathbf{r}_{T}` を近似する。
 
 .. math::
    \mathbf{r}_{T}(\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)})
@@ -507,7 +508,7 @@ SLAMのヘッシアンは要素の有無がグラフの隣接関係に対応す�
    &D_{4} = {H^{m}_{01}}^{\top}R_{01}^{-1}H^{m}_{01} + {H^{m}_{11}}^{\top}R_{11}^{-1}H^{m}_{11} + {H^{m}_{21}}^{\top}R_{21}^{-1}H^{m}_{21} \\
    &D_{5} = {H^{m}_{12}}^{\top}R_{12}^{-1}H^{m}_{12} + {H^{m}_{32}}^{\top}R_{32}^{-1}H^{m}_{32} \\
 
-ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目のブロックは状態ベクトル :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目のブロックは状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろうか。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列ブロックの要素および5行2列ブロックの要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列ブロックの要素および6行3列ブロックの要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
+ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目・5列目は状態ベクトル :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目・2列目は状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろう。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列の要素および5行2列の要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列の要素および6行3列の要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
 
 Sliding window
 ~~~~~~~~~~~~~~
@@ -520,7 +521,7 @@ Marginalization の目的
 ----------------------
 
 さて、時刻 :math:`T` で姿勢およびランドマークの推定が終了したとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{\mathbf{m}_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで最適な姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を求めることができる。
-しかしこれには問題がある。時刻 :math:`T+1,T+2,\;`T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、高速に姿勢およびランドマーク座標を推定することができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
+しかしこれには問題がある。時刻 :math:`T+1,T+2,\;T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、姿勢とランドマーク座標を高速に推定することができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
 計算量の増大を抑えるため、1時刻ぶんの姿勢およびランドマークを新規に追加するごとに、1時刻ぶんの古い姿勢と不必要なランドマークを削除する必要がある。このように、1時刻ごとに姿勢やランドマークの追加および削除を行う手法を Sliding Window と呼ぶ。
 
 このあと詳しく解説するが、グラフからノード(姿勢やランドマーク)を単純に削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの最適化を行うという問題の形式が破綻してしまう。時刻 :math:`0` から最新の時刻までの状態を最適化するという問題の形式を保ったまま Window 内にあるノードを最適する手法を Marginalization と呼ぶ。
@@ -528,7 +529,7 @@ Marginalization の目的
 Marginalization の効果
 ----------------------
 
-この問題を解消するために行うのが Marginalization というテクニックである。Marginalization は、古くなった姿勢やランドマークを最適化問題から除去するテクニックであり、次の効果がある。
+Marginalization は、古くなった姿勢やランドマークを最適化問題から除去するテクニックであり、次の効果がある。
 
 1. 古くなったランドマークを最適化問題から削除することで計算量の増大を抑えることができる
 2. 古くなったノードを除去しつつも、時刻 `0` から最新時刻までの全体の姿勢およびランドマークの最適化を行うという問題の整合性を保ち続けることができる
@@ -584,7 +585,7 @@ Marginalizationは次のような手法である。
 1. 状態ベクトルと誤差関数の並べ替え
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` のうち、更新対象から外す変数 :math:`\mathbf{x}_{0}` とそれ以外の変数をそれぞれまとめる必要がある。まとめる操作を行ったベクトルを :math:`\mathbf{y}^{\times}_{4}` としよう。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
+Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` のうち、更新対象から外す変数 :math:`\mathbf{x}_{0}` と更新対象として残す変数をそれぞれまとめる必要がある。この操作を行ったベクトルを :math:`\mathbf{y}^{\times}_{4}` としよう。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
 
 .. math::
    \mathbf{y}^{\times}_{4} &= \left[\mathbf{y}^{m}_{4}, \mathbf{y}^{r}_{4}\right] \\
@@ -799,18 +800,18 @@ Marginalization とは日本語で「(確率分布の)周辺化」を意味す�
 :math:`\mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{\mu}` は定数なので比例関係に含めることができる。
 
 .. math::
-    \mathcal{N}(\mathbf{x} | \mathbf{\mu}, \Sigma)
+    \mathcal{N}(\mathbf{\mu}, \Sigma)
     \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} + \mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{x})
 
 :math:`\mathbf{\eta} = \mathbf{\mu}^{\top}\Sigma^{-1}, \Lambda = \Sigma^{-1}` とおけば、全く同じ正規分布を異なるパラメータで表現できる。これが正規分布の information form である。通常これは :math:`\mathcal{N}^{-1}(\mathbf{\eta},  \Lambda)` と表記される。
 
 .. math::
-   \mathcal{N}^{-1}(\mathbf{\eta},  \Lambda) \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Lambda\mathbf{x} + \mathbf{\eta}^{\top}\mathbf{x})
+   \mathcal{N}^{-1}(\mathbf{\eta}, \Lambda) \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Lambda\mathbf{x} + \mathbf{\eta}^{\top}\mathbf{x})
 
 更新量を確率変数とみなす
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-更新量 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` を確率変数とみなし、計算に使った行列 :math:`\begin{bmatrix} H^{mm}_{4} & H^{mr}_{4} \\ H^{rm}_{4} & H^{rr}_{4} \end{bmatrix}, \begin{bmatrix} \mathbf{b}^{m}_{4} \\ \mathbf{b}^{r}_{4} \end{bmatrix}` をパラメータとするの正規分布に従うと考える。
+更新量 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` を確率変数とみなし、これらが行列 :math:`\begin{bmatrix} H^{mm}_{4} & H^{mr}_{4} \\ H^{rm}_{4} & H^{rr}_{4} \end{bmatrix}, \begin{bmatrix} \mathbf{b}^{m}_{4} \\ \mathbf{b}^{r}_{4} \end{bmatrix}` をパラメータとする正規分布に従うと考える。
 
 .. math::
     \begin{bmatrix}
@@ -868,7 +869,7 @@ Marginalization とは日本語で「(確率分布の)周辺化」を意味す�
         \Delta \mathbf{y}^{r}_{4}
     \end{bmatrix}\right)
 
-指数関数は単調増加なので、指数部分の中身だけに着目すればよい。
+指数関数は単調増加なので、指数部分だけに着目すればよい。
 
 .. math::
     &\underset{\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}}{\arg \max} \;
