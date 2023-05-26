@@ -351,17 +351,20 @@ IMU観測値 :math:`\mathbf{u}_{1:3}` およびランドマークの観測値 :m
 
 .. math::
    J_{3} = \frac{\partial \mathbf{r}_{3}}{\partial \mathbf{y}_{3}} =
-   \begin{bmatrix}
+   \left[
+   \begin{array}{cccc|cc}
       I         &             &             &             &             &             \\
      -G_{0}     & I           &             &             &             &             \\
                 & -G_{1}      & I           &             &             &             \\
                 &             & -G_{2}      & I           &             &             \\
+    \hline
     -H^{x}_{01} &             &             &             & -H^{m}_{01} &             \\
                 & -H^{x}_{11} &             &             & -H^{m}_{11} &             \\
                 &             & -H^{x}_{21} &             & -H^{m}_{21} &             \\
                 & -H^{x}_{12} &             &             &             & -H^{m}_{12} \\
                 &             &             & -H^{x}_{32} &             & -H^{m}_{32} \\
-   \end{bmatrix}
+   \end{array}
+   \right]
    :label: jacobian-j4
 
 Gauss-Newton法による誤差最小化
