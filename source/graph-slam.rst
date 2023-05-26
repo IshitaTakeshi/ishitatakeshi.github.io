@@ -29,14 +29,14 @@ SLAMの確率モデルによる表現
 | まずはSLAMの問題を確率モデルで表現することから始める。
 | 初期時刻 :math:`0` から :math:`T` までの姿勢を :math:`\mathbf{x}_{0:T} = \{\mathbf{x}_{0},...,\mathbf{x}_{T}\}` 、 :math:`\mathbf{x}_{0:T}` から観測されたランドマークの集合を :math:`M_{0:T} = \{\mathbf{m}_{1},...,\mathbf{m}_{N_{T}}\}` とする。
 | 時刻 :math:`0` から :math:`T` の間に得られたIMU観測値の集合を :math:`\mathbf{u}_{1:T} = \{\mathbf{u}_{1},...,\mathbf{u}_{T}\}` とする。たとえば :math:`\mathbf{u}_{1}` は時刻 :math:`0` から :math:`1` の間に得られたIMU観測値を表している。
-| ランドマーク観測値の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までのセンサ姿勢とそこから観測可能なランドマークの組み合わせを表している。
+| カメラから得られるランドマークの観測値(画像特徴点など)の集合を :math:`Z_{0:T} = \{\mathbf{z}_{ij} \;|\; (i, j) \in S_{0:T}\}` とする。ここで :math:`S_{0:T}` は時刻 :math:`0` から時刻 :math:`T` までのセンサ姿勢とそこから観測可能なランドマークの組み合わせを表している。
 | 我々の目的は、次の分布を明らかにすることである。
 
 .. math::
     p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
     :label: fullslamposterior
 
-| すなわち、IMUやカメラから得られた観測情報を用いて、時刻 :math:`0` から :math:`T` までの姿勢およびその間に観測されたランドマークの分布を求めるという問題である。
+| すなわち、IMUやカメラから得られた観測情報を用いて、時刻 :math:`0` から :math:`T` までの姿勢およびその間に観測されたランドマークの分布を求める問題を解きたい。
 
 状態分布の再帰的推定法の導出
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,31 +47,30 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 
 .. math::
    &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
-   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
    :label: factored-posterior
 
-| :math:`Z_{T}` は時刻 :math:`T` に観測できるランドマークの集合である。
-| :math:`\eta_{T}` は次で計算される定数である。
+| :math:`Z_{T}` は時刻 :math:`T` に得られたランドマーク観測値の集合である。また、 :math:`\eta_{T}` は次で計算される定数である。
 
 .. math::
     \eta_{T} = \frac{p(\mathbf{u}_{1:T},Z_{0:T-1})}{p(\mathbf{u}_{1:T},Z_{0:T})}
 
 :math:`\eta_{T}` は観測値 :math:`\mathbf{u}_{1:T},Z_{0:T}` の確率分布のみで構成されているため、いったん観測値が得られてしまえば :math:`\eta_{T}` は変化しない。したがって姿勢推定の問題では :math:`\eta_{T}` は定数として扱うことができる。
 
-| :math:`Z_{T}` の分布を見てみよう。:math:`Z_{T}` の分布は時刻 :math:`T` のカメラ姿勢と時刻 :math:`T` に観測できるランドマークの座標にしか依存しない。たとえば、時刻 :math:`T` のカメラ姿勢やそこから観測できるランドマーク位置が変化すれば、カメラに映るランドマークの像 :math:`Z_{T}` は変化する。一方で、時刻 :math:`T` におけるIMU観測値がどうであろうと、その値はカメラに映るランドマークの像になんら直接的変化を及ぼさない。これにより、 :math:`Z_{T}` の確率分布を次のように単純化できる [#simplify_z_distribution]_ 。
+| 次に :math:`Z_{T}` の分布 :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})` に着目しよう。:math:`Z_{T}` の分布は時刻 :math:`T` のカメラ姿勢とそのときに観測できるランドマークの座標にしか依存しない。たとえば、時刻 :math:`T` のカメラ姿勢やそこから観測できるランドマーク位置が変化すれば、カメラに映るランドマークの像 :math:`Z_{T}` は変化する。一方で、時刻 :math:`T-1` までにカメラから得られた観測値 :math:`Z_{0:T-1}` は :math:`Z_{T}` の値になんら影響を及ぼさない。また、時刻 :math:`T` におけるIMU観測値がどうであろうと、その値はカメラに映るランドマークの像になんの直接的変化も与えない。したがって、 :math:`Z_{T}` の確率分布を次のように単純化できる [#simplify_z_distribution]_ 。
 
 .. math::
-    p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T})
+    p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T})
 
 
-:eq:`factored-posterior` のもうひとつの確率についてもベイズ則を適用する。
+さらに :eq:`factored-posterior` を構成する確率分布 :math:`p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1})` についてもベイズ則を適用する。
 
 .. math::
     &p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
     &= p(\mathbf{x}_{T}\;|\;\mathbf{x}_{0:T-1},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})\;
       p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1})
 
-計算の簡略化のため、時刻 :math:`T` の姿勢 :math:`\mathbf{x}_{T}` が1時刻前の姿勢 :math:`\mathbf{x}_{T-1}` と時刻 :math:`T-1` から :math:`T` までに得られるIMU観測値 :math:`\mathbf{u}_{T}` のみを用いて予測できると仮定する。したがって先ほどと同様の議論により、次のような簡略化を行うことができる。
+計算の簡略化のため、 :math:`\mathbf{x}_{T-1}` と :math:`\mathbf{u}_{T}` のみを用いて :math:`\mathbf{x}_{T}` を予測できると仮定する。したがって先ほどと同様の議論により、次のような簡略化を行うことができる。
 
 .. math::
     &p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
@@ -82,7 +81,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
     p(\mathbf{x}_{0:T-1},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
 
-:math:`\mathbf{x}_{T-1}` までの姿勢を予測するためには時刻 :math:`T-1` までのIMU観測値があれば十分なので、 :math:`\mathbf{u}_{T}` を条件から除外することができる。
+時刻 :math:`T-1` におけるカメラ姿勢 :math:`\mathbf{x}_{T-1}` を予測するためには時刻 :math:`T-1` までのIMU観測値があれば十分なので、 :math:`\mathbf{u}_{T}` を条件から除外することができる。
 また、時刻 :math:`0` から :math:`T-1` までに観測できるランドマークの集合は :math:`M_{0:T-1}` なので、これも修正する。
 
 .. math::
@@ -98,7 +97,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 
 .. math::
    &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
-   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
+   &= \eta_{T} \; p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1})\;p(\mathbf{x}_{0:T},M_{0:T}\;|\;\mathbf{u}_{1:T},Z_{0:T-1}) \\
    &= \eta_{T} \;
     p(Z_{T}\;|\;\mathbf{x}_{T},M_{0:T}) \;
     p(\mathbf{x}_{T}\;|\;\mathbf{x}_{T-1},\mathbf{u}_{T})\;
@@ -123,7 +122,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 
 この式では時刻 :math:`0` における姿勢の分布を :math:`p(\mathbf{x}_{0})` としている。一般的に :math:`\mathbf{x}_{0}` は推定するものではなく基準座標として任意に定めるものであるため、このようにおくことができる。
 
-一般的なSLAMの問題では時刻 :math:`i` までに観測されるすべてのランドマーク :math:`M_{0:i}` を時刻 :math:`T` までのすべての姿勢 :math:`\mathbf{x}_{0:i}` から観測できるわけではない。これを踏まえて式 :eq:`recursive-decomposition` をさらに具体的に次のように書くことができる。
+一般的なSLAMの問題では時刻 :math:`T` までに観測されるすべてのランドマーク :math:`M_{0:T}` を時刻 :math:`T` までのすべての姿勢 :math:`\mathbf{x}_{0:T}` から観測できるわけではない。これを踏まえて式 :eq:`recursive-decomposition` をさらに具体的に次のように書くことができる。
 
 .. math::
    &p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
@@ -138,12 +137,12 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 1. 各時刻におけるオドメトリ :math:`p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}), k = 1,...,T` を推定する問題
 2. 各ランドマークの観測値の分布 :math:`p(\mathbf{z}_{ij}\;|\;\mathbf{x}_{i},\mathbf{m}_{j}),\;(i, j) \in S_{0:T}` を求める問題
 
-に変換することができた。
+に分解することができた。
 
 初期状態分布の記述
 ~~~~~~~~~~~~~~~~~~
 
-初期姿勢 :math:`\mathbf{x}_{0}` はプログラム上で固定値にすればよいため分布を仮定する必要はないのだが、便宜的に次のように設定しておく。
+初期姿勢 :math:`\mathbf{x}_{0}` はプログラム上で固定値にすればよいため、分布を仮定する必要はないのだが、便宜的に次のように設定しておく。
 
 .. math::
     p(\mathbf{x}_{0}) \propto \exp\{-\frac{1}{2}\left[\mathbf{x}_{0} - \mathbf{0}\right]^{\top} Q_{0}^{-1} \left[\mathbf{x}_{0} - \mathbf{0}\right]\} = \exp(\mathbf{x}_{0}^{\top} Q_{0}^{-1} \mathbf{x}_{0}),\\
@@ -168,7 +167,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 
 式 :eq:`posterior-decomposition` において、 :math:`p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k})` は、前の時刻の姿勢 :math:`\mathbf{x}_{k-1}` および前の時刻から現在時刻までのIMU観測値 :math:`\mathbf{u}_{k}` に基づいた現在の姿勢の予測を表現している。
 
-時刻 :math:`k` の姿勢 :math:`\mathbf{x}_{k}` に対して運動モデルの予測 :math:`\mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})` の誤差が分散 :math:`Q_{k} \in \mathbb{R}^{6 \times 6}` の正規分布に従うとすると、この分布は
+時刻 :math:`k` の姿勢 :math:`\mathbf{x}_{k}` に対して運動モデルの予測 :math:`\mathbf{g}(\mathbf{x}_{k-1}, \mathbf{u}_{k})` の誤差が分散 :math:`Q_{k} \in \mathbb{R}^{6 \times 6}` の正規分布に従うとする (実際にはIMUによる推定姿勢は直交座標上の正規分布に従わないが、今回はモデルの説明のため正規分布に従うこととする [#imu_distribution]_ ) 。この分布は
 
 .. math::
     p(\mathbf{x}_{k}\;|\;\mathbf{x}_{k-1},\mathbf{u}_{k}) =
@@ -181,9 +180,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 対数尤度関数
 ~~~~~~~~~~~~
 
-推定したい状態は確率分布の頂点の値である。
-
-確率分布が最大値をとるということは、そこに真の状態および真のランドマーク位置がある可能性が高いということである。
+状態分布が最大値をとるということは、そこに真の状態および真のランドマーク位置がある可能性が高いということである。
 
 .. math::
     \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
@@ -209,7 +206,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
     \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
     &= \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; \log p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) \\
 
-結果として、最大確率をとる状態を求める問題はは次の最小化問題に帰結する。
+結果として、最大確率をとる状態を求める問題は次の最小化問題に帰結する。
 
 .. math::
     \underset{\mathbf{x}_{0:T},\,M_{0:T}}{\arg\max} \; p(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
@@ -226,7 +223,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 誤差関数の最小化
 ----------------
 
-さて、式 :eq:`error-function` に示す誤差関数は残差 :math:`\mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})` および共分散行列 :math:`\Sigma_{T}` を用いて次のように表現することができる。
+さて、式 :eq:`error-function` に示す誤差関数 :math:`E_{T}` は残差 :math:`\mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})` および共分散行列 :math:`\Sigma_{T}` を用いて次のように表現することができる。
 
 .. math::
    \mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T}) =
@@ -256,7 +253,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
    E_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
    = \mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{x}_{0:T}, M_{0:T}\;|\;\mathbf{u}_{1:T}, Z_{0:T})
 
-このままでは表記が煩雑なので状態を :math:`\mathbf{y}_{T} = \left[\mathbf{x}_{0:T}^{\top},\; M_{0:T}^{\top}\right]^{\top}` とおいて次のように書くことにしよう。
+このままでは表記が煩雑なので状態を :math:`\mathbf{y}_{T} = \left[\mathbf{x}_{0}^{\top},...,\;\mathbf{x}_{T}^{\top},\; \mathbf{m}_{1}^{\top},...,\;\mathbf{m}_{N_{T}}^{\top}\right]^{\top}` とおいて次のように書くことにしよう。
 
 .. math::
    E_{T}(\mathbf{y}_{T}) = \mathbf{r}_{T}(\mathbf{y}_{T})^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{y}_{T})
@@ -307,7 +304,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 具体例
 ~~~~~~
 
-次の例を用いてJacobianの形をより具体的に見てみよう。
+例を用いてJacobianの形をより具体的に見てみよう。
 
 | 姿勢を :math:`\mathbf{x}_{0:3} = \{\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3}\}` 、 ランドマークを :math:`\mathbf{m}_{1:2} = \{\mathbf{m}_{1},\mathbf{m}_{2}\}` とする。
 | また、姿勢 :math:`\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2}` からランドマーク :math:`\mathbf{m}_{0}` を、姿勢 :math:`\mathbf{x}_{1},\mathbf{x}_{3}` からランドマーク :math:`\mathbf{m}_{1}` を観測できるものとする。
@@ -517,25 +514,28 @@ Sliding window
 計算量の増大を防ぐため、多くのSLAMでは Sliding Window という方式がとられる。これは、状態に対して1時刻ぶんの姿勢およびそこから観測されるランドマークを追加すると同時に、状態から最も古い姿勢および不必要なランドマークを除去することで、計算量の増大を防ごうというものである。
 ここではノードの追加と、推定結果全体の整合性を保ったままノードを除去する方法 "Marginalization" を解説する。
 
-Marginalization の目的
+Marginalization
 ----------------------
+
+目的
+~~~~
 
 さて、時刻 :math:`T` で姿勢およびランドマークの推定が終了したとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{\mathbf{m}_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで最適な姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を求めることができる。
 しかしこれには問題がある。時刻 :math:`T+1,T+2,\;T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、姿勢とランドマーク座標を高速に推定することができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
 計算量の増大を抑えるため、1時刻ぶんの姿勢およびランドマークを新規に追加するごとに、1時刻ぶんの古い姿勢と不必要なランドマークを削除する必要がある。このように、1時刻ごとに姿勢やランドマークの追加および削除を行う手法を Sliding Window と呼ぶ。
 
-このあと詳しく解説するが、グラフからノード(姿勢やランドマーク)を単純に削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの最適化を行うという問題の形式が破綻してしまう。時刻 :math:`0` から最新の時刻までの状態を最適化するという問題の形式を保ったまま Window 内にあるノードを最適する手法を Marginalization と呼ぶ。
+単純にグラフからノード(姿勢やランドマーク)を削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの最適化を行うという問題の形式が破綻してしまう。時刻 :math:`0` から最新の時刻までの状態を最適化するという問題の形式を保ったまま Window 内にあるノードを最適化する手法が Marginalization である。
 
-Marginalization の効果
-----------------------
+効果
+~~~~
 
-Marginalization は、古くなった姿勢やランドマークを最適化問題から除去するテクニックであり、次の効果がある。
+Marginalization には主に次の効果がある。
 
 1. 古くなったランドマークを最適化問題から削除することで計算量の増大を抑えることができる
 2. 古くなったノードを除去しつつも、時刻 `0` から最新時刻までの全体の姿勢およびランドマークの最適化を行うという問題の整合性を保ち続けることができる
 
-Marginalization の手法
-----------------------
+手法
+~~~~
 
 Marginalizationは次のような手法である。
 
@@ -622,7 +622,7 @@ Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` の�
        J^{m}_{4} & J^{r}_{4}
    \end{bmatrix}
 
-ヘッシアンを計算してみよう。
+ヘッシアンを計算する。
 
 .. math::
     {J^{\times}_{4}}^{\top}J^{\times}_{4}
@@ -709,7 +709,7 @@ Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` の�
 
 我々はもはや :math:`\mathbf{y}^{m}_{4} = \mathbf{x}^{0}` を更新しない。 :math:`\mathbf{y}^{r}_{4}` さえ更新できればよい。計算量を削減するため、 :math:`\Delta \mathbf{y}^{m}_{4}` を計算することなく、 :math:`\Delta \mathbf{y}^{r}_{4}` のみを得たい。これを実現するにはどうすればよいだろうか。
 
-じつは両辺に
+じつは両辺に次の行列をかけると、これを実現できる。
 
 .. math::
     \begin{bmatrix}
@@ -717,7 +717,7 @@ Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` の�
         -H^{rm}_{4}{H^{mm}_{4}}^{-1} & I \\
     \end{bmatrix}
 
-という行列をかけると、これを実現できる。実際に計算してみよう。
+実際に計算してみよう。
 
 .. math::
     \begin{bmatrix}
@@ -953,7 +953,7 @@ Marginalization と Conditioning
    :label: marginalized-y-r-4-distribution
 
 
-さらに、 :math:`\Delta \mathbf{y}^{r}_{4}` で条件づけされた :math:`\Delta \mathbf{y}^{m}_{4}` の分布は次のように表される [#prml-conditional-marginal]_ 。
+さらに、 :math:`\Delta \mathbf{y}^{r}_{4}` で条件づけされた :math:`\Delta \mathbf{y}^{m}_{4}` の分布は次のように表される [#prml_conditional_marginal]_ 。
 
 .. math::
     \Delta \mathbf{y}^{m}_{4} | \Delta \mathbf{y}^{r}_{4} \sim \mathcal{N}^{-1}\left(
@@ -966,5 +966,6 @@ Marginalization と Conditioning
 
 式 :eq:`update-delta-y-r` :eq:`update-delta-y-m` を見ると、それぞれ :eq:`marginalized-y-r-4-distribution` :eq:`conditional-y-m-4-given-y-r-4-distribution` で表される分布の最大化に対応していることがおわかりいただけるだろう。
 
-.. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:N},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
-.. [#prml-conditional-marginal] Bishop, Christopher M., and Nasser M. Nasrabadi. Pattern recognition and machine learning. Vol. 4. No. 4. New York: springer, 2006. pp. 85-90.
+.. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
+.. [#prml_conditional_marginal] Bishop, Christopher M., and Nasser M. Nasrabadi. Pattern recognition and machine learning. Vol. 4. No. 4. New York: springer, 2006. pp. 85-90.
+.. [#imu_distribution] Long, Andrew W., et al. "The banana distribution is Gaussian: A localization study with exponential coordinates." Robotics: Science and Systems VIII 265 (2013).
