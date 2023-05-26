@@ -307,7 +307,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 例を用いてJacobianの形をより具体的に見てみよう。
 
 | 姿勢を :math:`\mathbf{x}_{0:3} = \{\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3}\}` 、 ランドマークを :math:`\mathbf{m}_{1:2} = \{\mathbf{m}_{1},\mathbf{m}_{2}\}` とする。
-| また、姿勢 :math:`\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2}` からランドマーク :math:`\mathbf{m}_{0}` を、姿勢 :math:`\mathbf{x}_{1},\mathbf{x}_{3}` からランドマーク :math:`\mathbf{m}_{1}` を観測できるものとする。
+| また、姿勢 :math:`\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2}` からランドマーク :math:`\mathbf{m}_{1}` を、姿勢 :math:`\mathbf{x}_{1},\mathbf{x}_{3}` からランドマーク :math:`\mathbf{m}_{2}` を観測できるものとする。
 
 姿勢とランドマークの関係を図で表すとこのようになる。
 
@@ -324,7 +324,7 @@ IMU観測値 :math:`\mathbf{u}_{1:3}` およびランドマークの観測値 :m
 
 .. math::
     \mathbf{u}_{1:3} &= \{\mathbf{u}_{1},\mathbf{u}_{2},\mathbf{u}_{3}\}  \\
-    Z_{1:3} &= \{\mathbf{z}_{11},\mathbf{z}_{21},\mathbf{z}_{22},\mathbf{z}_{32},\mathbf{z}_{42}\}
+    Z_{1:3} &= \{\mathbf{z}_{01},\mathbf{z}_{11},\mathbf{z}_{21},\mathbf{z}_{12},\mathbf{z}_{32}\}
 
 これらをもとに誤差関数を構成しよう。
 
@@ -414,9 +414,9 @@ Gauss-Newton法ではまず初期値 :math:`\mathbf{y}_{T}^{(0)}` を定め、�
    \Delta \mathbf{y}_{T}^{(0)} = - \left({J_{T}^{(0)}}^{\top} \Sigma_{T}^{-1} J_{T}^{(0)}\right)^{-1} {J_{T}^{(0)}}^{\top} \Sigma_{T}^{-1} \mathbf{r}_{T}(\mathbf{y}_{T}^{(0)})
    :label: gauss-newton-update
 
-さて、 :math:`\tilde{E}_{T}^{(0)}` はあくまでもとの誤差関数 :math:`E_{T}` の近似式なので :math:`\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}` はもとの誤差関数 :math:`E_{T}` を最小化する値ではない。しかし近似が十分に優れているならば、 :math:`E_{T}(\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}) < E_{T}(\mathbf{y}_{T}^{(0)})` となっているはずである。したがって、次は :math:`\mathbf{y}_{T}^{(1)} = \mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}` とし、 :math:`\mathbf{y}_{T}^{(1)}` のまわりで誤差関数 :math:`E_{T}` を近似し、それを最小化するステップ幅 :math:`\Delta \mathbf{y}_{T}^{(1)}` を求める。Gauss-Newton法は誤差関数の変化が収束するまでこの操作を繰り返し、誤差関数 :math:`E_{T}` を最小化する状態の値を求める。
+さて、 :math:`\tilde{E}_{T}^{(0)}` はあくまでもとの誤差関数 :math:`E_{T}` の近似式なので :math:`\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}` はもとの誤差関数 :math:`E_{T}` を最小化する値ではない。しかし近似が十分に優れているならば、 :math:`E_{T}(\mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}) < E_{T}(\mathbf{y}_{T}^{(0)})` となっているはずである。したがって次は :math:`\mathbf{y}_{T}^{(1)} = \mathbf{y}_{T}^{(0)} + \Delta \mathbf{y}_{T}^{(0)}` とし、 :math:`\mathbf{y}_{T}^{(1)}` のまわりで誤差関数 :math:`E_{T}` を近似し、それを最小化するステップ幅 :math:`\Delta \mathbf{y}_{T}^{(1)}` を求める。Gauss-Newton法は誤差関数の変化が収束するまでこの操作を繰り返し、誤差関数 :math:`E_{T}` を最小化する状態の値を求める手法である。
 
-なお、 :math:`{J_{T}^{(0)}}^{\top} \Sigma_{T}^{-1} J_{T}^{(0)}` の部分は残差 :math:`\mathbf{r}_{T}` のヘッシアンを近似したものである。今後はこれを単にヘッシアンと呼ぶことにする。このヘッシアンの構造が Graph SLAM の性能に大きく影響してくる。
+なお、 :math:`{J_{T}^{(0)}}^{\top} \Sigma_{T}^{-1} J_{T}^{(0)}` の部分は残差 :math:`\mathbf{r}_{T}` のヘッシアンを近似したものである。今後はこれを単にヘッシアンと呼ぶことにする。このヘッシアンの構造がGauss-Newton法の計算速度に大きく影響してくる。
 
 Gauss-Newton法による状態推定の手順をまとめると次のようになる。
 
@@ -508,34 +508,21 @@ SLAMのヘッシアンは要素の有無がグラフの隣接関係に対応す�
    &D_{4} = {H^{m}_{01}}^{\top}R_{01}^{-1}H^{m}_{01} + {H^{m}_{11}}^{\top}R_{11}^{-1}H^{m}_{11} + {H^{m}_{21}}^{\top}R_{21}^{-1}H^{m}_{21} \\
    &D_{5} = {H^{m}_{12}}^{\top}R_{12}^{-1}H^{m}_{12} + {H^{m}_{32}}^{\top}R_{32}^{-1}H^{m}_{32} \\
 
-ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目・5列目は状態ベクトル :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目・2列目は状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろう。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列の要素および5行2列の要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列の要素および6行3列の要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
+ヘッシアンの各行および各列には状態が対応する。たとえばヘッシアンの5行目・5列目は状態ベクトル :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` の5つめの要素 :math:`\mathbf{m}_{1}` に対応する。ヘッシアンの2行目・2列目は状態ベクトルの2番目の要素 :math:`\mathbf{x}_{1}` に対応する。すると、 :numref:`examplegraph` のうち、接続していないノードに対応するヘッシアンの要素はゼロであり、接続しているノードに対応するヘッシアンの要素は非ゼロになっていることがおわかりいただけるだろう。たとえば、状態ベクトルの2番目の要素である :math:`\mathbf{x}_{1}` からは状態ベクトルの5番目の要素である :math:`\mathbf{m}_{1}` が観測できるため、ヘッシアンの2行5列目および5行2列目の要素は非ゼロである。状態ベクトルの3番目の要素である :math:`\mathbf{x}_{2}` からは状態ベクトルの6番目の要素である :math:`\mathbf{m}_{2}` が観測できないため、ヘッシアンの3行6列目および6行3列目の要素はゼロである。すなわち、ヘッシアンの構造は :numref:`examplegraph` のグラフの隣接行列に対応している。
 
-Sliding window
-~~~~~~~~~~~~~~
-
-さて、時刻が進むにつれて推定対象となる姿勢は増えていく。また新規にランドマークを観測するため、より多くのランドマークの位置を推定しなければならない。一方で、姿勢やランドマークが増えすぎるとその推定にかかる計算量が急速に増大してしまう。
-計算量の増大を防ぐため、多くのSLAMでは Sliding Window という方式がとられる。これは、状態に対して1時刻ぶんの姿勢およびそこから観測されるランドマークを追加すると同時に、状態から最も古い姿勢および不必要なランドマークを除去することで、計算量の増大を防ごうというものである。
-ここではノードの追加と、推定結果全体の整合性を保ったままノードを除去する方法 "Marginalization" を解説する。
+さて、時刻が進むにつれて推定対象となる姿勢は増えていく。また、新規にランドマークを観測するため、より多くのランドマークの位置を推定しなければならない。一方で、姿勢やランドマークが増えすぎるとその推定にかかる計算量が急速に増大してしまう。
+計算量の増大を防ぐため、多くのSLAMでは Sliding Window という方式がとられる。これは、新たに1時刻ぶんの姿勢とそこから観測されるランドマークを状態ベクトルに追加すると同時に、状態ベクトルから最も古い姿勢および不必要なランドマークを除去することで、計算量の増大を防ごうというものである。
+次の章では推定結果全体の整合性を保ったままノードを除去する方法 "Marginalization" を解説する。
 
 Marginalization
-----------------------
+---------------
 
 目的
 ~~~~
 
-さて、時刻 :math:`T` で姿勢およびランドマークの推定が終了したとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{\mathbf{m}_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで最適な姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を求めることができる。
-しかしこれには問題がある。時刻 :math:`T+1,T+2,\;T+3,\;...` と姿勢やランドマークを追加していけば、計算量が増大してしまい、姿勢とランドマーク座標を高速に推定することができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
-計算量の増大を抑えるため、1時刻ぶんの姿勢およびランドマークを新規に追加するごとに、1時刻ぶんの古い姿勢と不必要なランドマークを削除する必要がある。このように、1時刻ごとに姿勢やランドマークの追加および削除を行う手法を Sliding Window と呼ぶ。
-
-単純にグラフからノード(姿勢やランドマーク)を削除して残ったグラフのみを最適化すると、時刻 :math:`0` から最新の時刻までの最適化を行うという問題の形式が破綻してしまう。時刻 :math:`0` から最新の時刻までの状態を最適化するという問題の形式を保ったまま Window 内にあるノードを最適化する手法が Marginalization である。
-
-効果
-~~~~
-
-Marginalization には主に次の効果がある。
-
-1. 古くなったランドマークを最適化問題から削除することで計算量の増大を抑えることができる
-2. 古くなったノードを除去しつつも、時刻 `0` から最新時刻までの全体の姿勢およびランドマークの最適化を行うという問題の整合性を保ち続けることができる
+さて、時刻 :math:`T` までの姿勢とランドマークを推定できたとしよう。次の時刻 :math:`T+1` では、姿勢 :math:`\mathbf{x}_{T+1}` および新たに観測されたランドマーク :math:`M_{T+1} = \{\mathbf{m}_{j} | (T+1, j)\in S_{T+1}\}` を誤差関数に追加し、それを最適化することで姿勢 :math:`\mathbf{x}_{0},...,\mathbf{x}_{T+1}` を推定することができる。
+しかしこれには問題がある。時刻 :math:`T+2` 以降も同様に姿勢やランドマークをグラフに追加していけば、計算量が増大してしまい、姿勢の値とランドマーク座標を高速に推定することができなくなってしまう。SLAMは一般的に低消費電力のデバイスで高速に動作することが求められるため、計算量の増加は致命的である。
+計算量の増大を抑えるため、1時刻ぶんの姿勢およびランドマークを新規に追加するごとに、1時刻ぶんの古い姿勢と不必要なランドマークを削除する必要がある。このように、1時刻ごとに姿勢やランドマークの追加および削除を行う手法を Sliding Window と呼ぶ。Sliding Window において計算に不要なノード(姿勢あるいはランドマーク)を無視する方法が Marginalization である。
 
 手法
 ~~~~
@@ -588,14 +575,14 @@ Marginalizationは次のような手法である。
 1. 状態ベクトルと誤差関数の並べ替え
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` のうち、更新対象から外す変数 :math:`\mathbf{x}_{0}` と更新対象として残す変数をそれぞれまとめる必要がある。この操作を行ったベクトルを :math:`\mathbf{y}^{\times}_{4}` としよう。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
+Marginalization を行う際は、状態ベクトルのうち、更新対象から外す変数と更新対象として残す変数をそれぞれまとめる必要がある。この操作を行ったベクトルを :math:`\mathbf{y}^{\times}_{4}` としよう。今回は :math:`\mathbf{x}_{0}` を更新対象から外すため、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
 
 .. math::
    \mathbf{y}^{\times}_{4} &= \left[\mathbf{y}^{m}_{4}, \mathbf{y}^{r}_{4}\right] \\
    \mathbf{y}^{m}_{4} &= \mathbf{x}_{0}  \\
    \mathbf{y}^{r}_{4} &= \left[\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{x}_{4},\mathbf{m}_{1},\mathbf{m}_{2}\right] \\
 
-もともと :math:`\mathbf{x}_{0}` が :math:`\mathbf{y}_{4}` の先頭にあるので上記の例では :math:`\mathbf{y}^{\times}_{4} = \mathbf{y}_{4}` となっているが、もしたとえば :math:`\mathbf{x}_{0}` とともに :math:`\mathbf{m}_{1}` も更新対象から外すのであれば、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
+もともと :math:`\mathbf{x}_{0}` が :math:`\mathbf{y}_{4}` の先頭にあるので上記の例では :math:`\mathbf{y}^{\times}_{4} = \mathbf{y}_{4}` となっているが、もし、たとえば :math:`\mathbf{x}_{0}` とともに :math:`\mathbf{m}_{1}` も更新対象から外すのであれば、 :math:`\mathbf{y}^{\times}_{4}` は次のようになる。
 
 .. math::
    \mathbf{y}^{\times}_{4} &= \left[\mathbf{y}^{m}_{4}, \mathbf{y}^{r}_{4}\right] \\
@@ -785,7 +772,7 @@ Marginalization を行う際は、状態ベクトル :math:`\mathbf{y}_{4}` の�
 コラム：なぜ marginalization と呼ばれるのか
 -------------------------------------------
 
-Marginalization とは日本語で「(確率分布の)周辺化」を意味するのだが、これのいったいどこが周辺化になっているのだろうか。
+Marginalization とは日本語で「(確率分布の)周辺化」を意味するのだが、いったいどこが周辺化になっているのだろうか。
 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` を正規分布に従う確率変数とみなすとこの答えが見えてくる。
 
 正規分布の information form による表現
@@ -833,7 +820,7 @@ Marginalization とは日本語で「(確率分布の)周辺化」を意味す�
     \right)\\
     :label: canonical-delta-y4-distribution
 
-じつは更新量 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` の計算はこの確率の最大化に対応している。実際にやってみよう。
+じつは更新量 :math:`\Delta \mathbf{y}^{m}_{4}, \Delta \mathbf{y}^{r}_{4}` の計算はこの確率の最大化に対応している。実際に計算してみよう。
 
 まずは分布を書き下してみる。
 
@@ -946,7 +933,7 @@ Marginalization とは日本語で「(確率分布の)周辺化」を意味す�
 Marginalization と Conditioning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-じつは式 :eq:`canonical-delta-y4-distribution` で示される分布の :math:`\Delta \mathbf{y}^{r}_{4}` についての周辺分布は次の式で表せることが知られている。
+:eq:`canonical-delta-y4-distribution` の :math:`\Delta \mathbf{y}^{r}_{4}` についての周辺分布は次の式で表せることが知られている。
 
 .. math::
     \Delta \mathbf{y}^{r}_{4} \sim \mathcal{N}^{-1}\left(
@@ -965,9 +952,7 @@ Marginalization と Conditioning
     \right)
     :label: conditional-y-m-4-given-y-r-4-distribution
 
-先ほど information form の正規分布のパラメータで線型方程式を作り、それを解くことが確率の最大化に対応することを示した。
-
-式 :eq:`update-delta-y-r` :eq:`update-delta-y-m` を見ると、それぞれ :eq:`marginalized-y-r-4-distribution` :eq:`conditional-y-m-4-given-y-r-4-distribution` で表される分布の最大化に対応していることがおわかりいただけるだろう。
+Information form の正規分布のパラメータで線型方程式を作り、それを解くことが確率の最大化に対応することを示した。式 :eq:`update-delta-y-r` :eq:`update-delta-y-m` を見ると、それぞれ :eq:`marginalized-y-r-4-distribution` :eq:`conditional-y-m-4-given-y-r-4-distribution` で表される分布の最大化に対応していることがおわかりいただけるだろう。
 
 .. [#simplify_z_distribution] もし、たとえば時刻 :math:`T` において1番目と3番目のランドマークしか観測できないのであれば、 :math:`Z_{T} = \{\mathbf{z}_{T1},\mathbf{z}_{T3}\}` は :math:`\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3}` にしか依存しないので :math:`p(Z_{T}\;|\;\mathbf{x}_{0:T},M_{0:T},\mathbf{u}_{1:T},Z_{0:T-1}) = p(Z_{T}\;|\;\mathbf{x}_{T},\mathbf{m}_{1},\mathbf{m}_{3})` とするべきであるが、ここでは表記の都合上すべてのランドマークを対象として :math:`M_{0:T}` としている。
 .. [#prml_conditional_marginal] Bishop, Christopher M., and Nasser M. Nasrabadi. Pattern recognition and machine learning. Vol. 4. No. 4. New York: springer, 2006. pp. 85-90.
