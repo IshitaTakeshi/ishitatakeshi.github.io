@@ -267,16 +267,19 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 
 .. math::
     J = \frac{\partial E_{T}}{\partial \mathbf{y}_{T}} =
-    \begin{bmatrix}
+    \left[
+    \begin{array}{cccc|ccc}
      I          &          &             &             &             &             &             \\
     -G_{0}      & \ddots   &             &             &             &             &             \\
                 & \ddots   & I           &             &             &             &             \\
                 &          & -G_{T-1}    & I           &             &             &             \\
+    \hline
     -H^{x}_{01} &          &             &             & -H^{m}_{01} &             &             \\
                 & \ddots   &             &             &             & \ddots      &             \\
                 &          & \ddots      &             &             & \ddots      &             \\
                 &          &             & -H^{x}_{TN} &             &             & -H^{m}_{TN} \\
-    \end{bmatrix}
+    \end{array}
+    \right]
 
 ここで :math:`G_{i},\; H^{x}_{ij},\; H^{m}_{ij}` は運動モデルおよび観測モデルのJacobianを表している。
 
