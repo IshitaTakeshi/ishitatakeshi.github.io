@@ -799,7 +799,7 @@ Marginalization とは日本語で「(確率分布の)周辺化」を意味す�
     \mathcal{N}(\mathbf{\mu}, \Sigma)
     \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Sigma^{-1}\mathbf{x} + \mathbf{\mu}^{\top}\Sigma^{-1}\mathbf{x})
 
-:math:`\mathbf{\eta} = \mathbf{\mu}^{\top}\Sigma^{-1}, \Lambda = \Sigma^{-1}` とおけば、全く同じ正規分布を異なるパラメータで表現できる。これが正規分布の information form である。通常これは :math:`\mathcal{N}^{-1}(\mathbf{\eta},  \Lambda)` と表記される。
+:math:`\mathbf{\eta} = \Sigma^{-1}\mathbf{\mu}, \; \Lambda = \Sigma^{-1}` とおけば、全く同じ正規分布を異なるパラメータで表現できる。これが正規分布の information form である。通常これは :math:`\mathcal{N}^{-1}(\mathbf{\eta},  \Lambda)` と表記される。
 
 .. math::
    \mathcal{N}^{-1}(\mathbf{\eta}, \Lambda) \propto \exp(-\frac{1}{2}\mathbf{x}^{\top}\Lambda\mathbf{x} + \mathbf{\eta}^{\top}\mathbf{x})
