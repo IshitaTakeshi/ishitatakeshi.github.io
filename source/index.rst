@@ -14,7 +14,7 @@ Takeshi Ishita
    :caption: Contents:
 
    about-me
-   experience
+   about-me-ja
    camera-motion
    so3
    sba
