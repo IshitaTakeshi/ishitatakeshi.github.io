@@ -19,7 +19,7 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
 
 .. figure:: images/homeomorphic-graph.svg
 
-    :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現したもの
+    :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現したもの。エッジにはセンサの観測値を対応させている。
 
 今回は運動センサとしてIMUを、観測センサとしてカメラを用いることとし、Graph SLAMを確率モデルから導出する。
 
@@ -319,7 +319,7 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 .. figure:: images/example-slam-graph.svg
   :align: center
 
-  姿勢とランドマークの関係を表現した図
+  センサ姿勢とランドマークの関係を表現した図。エッジには誤差を対応させている。
 
 |
 
