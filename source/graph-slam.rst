@@ -260,13 +260,13 @@ SLAMは高速に動作することが求められるため、ある事前情報�
 
 この誤差関数はGauss-Newton法によって最小化できる。
 
-誤差関数の微分
-~~~~~~~~~~~~~~
+残差の微分
+~~~~~~~~~~
 
-誤差関数 :math:`E_{T}` を状態 :math:`\mathbf{y}_{T}` で微分すると次のようになる。
+残差 :math:`\mathbf{m}_{T}` を状態 :math:`\mathbf{y}_{T}` で微分すると次のようになる。
 
 .. math::
-    J = \frac{\partial E_{T}}{\partial \mathbf{y}_{T}} =
+    J = \frac{\partial \mathbf{r}_{T}}{\partial \mathbf{y}_{T}} =
     \left[
     \begin{array}{cccc|ccc}
      I          &          &             &             &             &             &             \\
@@ -350,7 +350,7 @@ IMU観測値 :math:`\mathbf{u}_{1:3}` およびランドマークの観測値 :m
    = \mathbf{r}_{3}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2})^{\top} \Sigma_{3}^{-1} \mathbf{r}_{3}(\mathbf{x}_{0:3}, \mathbf{m}_{1:2})
 
 
-状態を :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` とすると誤差関数の微分は次のようになる。
+状態を :math:`\mathbf{y}_{3} = \left[\mathbf{x}_{0},\mathbf{x}_{1},\mathbf{x}_{2},\mathbf{x}_{3},\mathbf{m}_{1},\mathbf{m}_{2}\right]` とすると残差の微分は次のようになる。
 
 .. math::
    J_{3} = \frac{\partial \mathbf{r}_{3}}{\partial \mathbf{y}_{3}} =
