@@ -185,6 +185,9 @@
 
 - `日経ソフトウエア 2017年8月号 「Pythonで機械学習」 <https://shop.nikkeibp.co.jp/front/commodity/0000/SW1231/>`__
 - `日経ソフトウエア 2020年5月号 「撮影した物体を3次元データで復元」 <https://shop.nikkeibp.co.jp/front/commodity/0000/SW1248/>`__
+- `TIER IV Tech Blog 「Visual SLAMの可能性と技術的チャレンジ」 <https://tech.tier4.jp/entry/2021/01/27/160000>`__
+- `TIER IV Tech Blog 「Visual-Inertial Odometryが自動運転に与えるインパクトと応用への課題」 <https://tech.tier4.jp/entry/2021/07/22/120000>`__
+- 日本写真測量学会　写真測量とリモートセンシング　2023年11月号　「市街地における自動運転へのSLAMの活用」
 
 発表資料
 =============

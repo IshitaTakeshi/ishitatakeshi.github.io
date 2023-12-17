@@ -150,6 +150,7 @@ Article
 
 - `日経ソフトウエア 2017年8月号 「Pythonで機械学習」 <https://shop.nikkeibp.co.jp/front/commodity/0000/SW1231/>`__
 - `日経ソフトウエア 2020年5月号 「撮影した物体を3次元データで復元」 <https://shop.nikkeibp.co.jp/front/commodity/0000/SW1248/>`__
+- Journal of the Japan society of photogrammetry and remote sensing, November 2023, "Utilization of SLAM for Autonomous Driving in Urban Areas"
 
 Presentations
 =============
