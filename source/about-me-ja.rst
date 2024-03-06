@@ -133,7 +133,7 @@
 .. image:: images/pcanet.png
     :width: 800
 
-| 　PCANet [#Chan_et_al_2015]_ は重みを PCA で計算することで高速にバッチ学習できるニューラルネットワークである。このネットワークは Pooling 層でヒストグラム計算を行っており、これが実行速度のボトルネックとなっていた。
+| 　PCANet [#Chan_et_al_2015]_ はネットワークの重みを PCA で計算することで高速にバッチ学習できるニューラルネットワークである。このネットワークは Pooling 層でヒストグラム計算を行っており、これが実行速度のボトルネックとなっていた。
 | 　この問題を解消するため、私はヒストグラム計算を CuPy で GPU 向けに実装した。計算を並列化したことで実行速度も大幅に向上した。CuPy開発者の方々の協力もあり、これは後に CuPy 本体にマージされている。 `#298 <https://github.com/cupy/cupy/pull/298>`__
 
 `Ensemble PCANet <https://github.com/IshitaTakeshi/PCANet/tree/ensemble>`__
