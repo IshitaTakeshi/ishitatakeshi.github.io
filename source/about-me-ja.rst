@@ -142,7 +142,7 @@
     :width: 800
 
 | Tomasi-Kanade法 [#Tomasi_et_al_1992]_ による3次元復元の実装。
-| 正投影カメラモデルを用いるので、実世界のアプリケーションとしては利用範囲が限定されるものの、SVDによって高速に3次元復元を行うことができる。
+| 正投影カメラモデルを用いるので、実世界のアプリケーションとしては利用範囲が限定されるものの、SVDによって高速に3次元復元を実行できる。
 |
 
 `Bilinear-Interpolation-SIMD <https://github.com/IshitaTakeshi/Bilinear-Interpolation-SIMD>`__
