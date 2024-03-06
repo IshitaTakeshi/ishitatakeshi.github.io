@@ -139,7 +139,7 @@
 `Ensemble PCANet <https://github.com/IshitaTakeshi/PCANet/tree/ensemble>`__
 ---------------------------------------------------------------------------
 
-| 　PCANet をアンサンブル学習することで分類器の性能向上を図った。 `JSAI 2017 <https://www.ai-gakkai.or.jp/jsai2017/webprogram/2017/paper-504.html>`__
+| 　PCANet をアンサンブル学習することで分類器の性能向上を図った。また、これを研究成果として `JSAI 2017 <https://www.ai-gakkai.or.jp/jsai2017/webprogram/2017/paper-504.html>`__ で発表した。
 
 `DTrie <https://github.com/IshitaTakeshi/dtrie>`__
 --------------------------------------------------
