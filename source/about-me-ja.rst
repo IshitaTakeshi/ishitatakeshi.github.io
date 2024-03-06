@@ -148,7 +148,7 @@
 
 `SCW <https://github.com/IshitaTakeshi/SCW>`__
 -------------------------------------------------
-| 　オンライン教師あり線形分類器である SCW (Soft Confidence-Weighted Learning) の実装 [#Wang_et_al_2012]_。
+| 　オンライン教師あり線形分類器 SCW (Soft Confidence-Weighted Learning) の実装 [#Wang_et_al_2012]_。
 
 ブログ
 ======
