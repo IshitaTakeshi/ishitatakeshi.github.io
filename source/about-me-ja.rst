@@ -150,8 +150,8 @@
 -------------------------------------------------
 | 　オンライン教師あり線形分類器 SCW (Soft Confidence-Weighted Learning) の実装 [#Wang_et_al_2012]_。
 
-ブログ
-======
+Qiita
+=====
 
 - `プログラマが持つべき心構え (The Zen of Python) <https://qiita.com/IshitaTakeshi/items/e4145921c8dbf7ba57ef>`__
 - `カルマンフィルタってなに？ <https://qiita.com/IshitaTakeshi/items/740ac7e9b549eee4cc04>`__
