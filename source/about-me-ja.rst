@@ -69,12 +69,28 @@
 成果物
 ======
 
+`icp_rust <https://github.com/tier4/icp_rust>`__
+------------------------------------------------
+
+.. image:: images/icp.gif
+    :width: 800
+
+| ICP (Iterative Closest Point) の Rust による実装。
+| TIER IV で開発中の OS の上で動かすことを目的としているが、Linux でも動作する。
+
 `YDLiDAR Driver <https://github.com/tier4/lidar_feature_extraction>`__
 ----------------------------------------------------------------------
 
-`YDLiDAR T-mini Pro <https://www.ydlidar.com/products/view/22.html>`__ 向けの Rust 製ドライバ
+手のひらサイズの小型な LiDAR である `YDLiDAR T-mini Pro <https://www.ydlidar.com/products/view/22.html>`__ の Rust 製ドライバ。
 
 .. image:: https://raw.githubusercontent.com/tier4/ydlidar_driver/main/images/plot_scan.gif
+
+`LOAM (Refactored version) <https://github.com/tier4/lidar_feature_extraction>`__
+---------------------------------------------------------------------------------
+
+| LiDAR ベースの SLAM アルゴリズムである LOAM [#Shan_et_al_2018]_ [#Shan_et_al_2020]_ をリファクタリングしたもの。
+| 自動運転用 OSS である `Autoware <https://github.com/autowarefoundation/autoware>`__ と統合して動かすことを目的としている。
+| LiDARから構造特徴を抽出する処理をオリジナルの実装よりも高速化している。
 
 `Tadataka <https://github.com/IshitaTakeshi/Tadataka>`__
 --------------------------------------------------------
@@ -104,28 +120,27 @@
 .. image:: images/road-damage-1.png
     :width: 800
 
-| 　SSD (Single Shot Multibox Detector) [#Liu_et_al_2016]_ によって道路のひび割れや損傷を検出できる。詳細な解説は `Qiita <https://qiita.com/IshitaTakeshi/items/915de731d8081e711ae5>`__ に掲載されている。
+| SSD (Single Shot Multibox Detector) [#Liu_et_al_2016]_ によって道路のひび割れや損傷を検出できる。
+| Maeda らの研究 [#Maeda_et_al_2018]_ を追証している。詳細な解説は `Qiita <https://qiita.com/IshitaTakeshi/items/915de731d8081e711ae5>`__ に掲載されている。
 
 `SBA <https://github.com/IshitaTakeshi/SBA>`__
 -----------------------------------------------
 
-.. figure:: images/reconstruction-without-ba.png
-    :width: 60%
+| 高効率な3次元復元アルゴリズム Sparse Bundle Adjustment (SBA) [#Lourakis_et_al_2009]_ を Python で実装した。
 
-    SBAを適用せずに3次元復元を行った結果
+`Tomasi-Kanade <https://github.com/IshitaTakeshi/Tomasi-Kanade>`__
+------------------------------------------------------------------
 
-.. figure:: images/reconstruction-with-ba.png
-    :width: 60%
+.. image:: images/tomasi-kanade-output-2.png
+    :width: 800
 
-    SBAを適用しながら3次元復元を行った結果
-
-| 　3次元復元における重要な最適化アルゴリズム Sparse Bundle Adjustment (SBA) [#Lourakis_et_al_2009]_ を実装した。
-| 　図は円筒の復元結果を表している。SBAを適用することで安定した3次元復元を実現できる。
+| Tomasi-Kanade法 [#Tomasi_et_al_1992]_ による3次元復元の実装。
+| 正投影カメラモデルを用いるので、実世界のアプリケーションとしては利用範囲が限定されるものの、SVDによって高速に3次元復元を行うことができる。
 
 `Bilinear-Interpolation-SIMD <https://github.com/IshitaTakeshi/Bilinear-Interpolation-SIMD>`__
 ----------------------------------------------------------------------------------------------
 
-| 　画像の画素補間に用いられるアルゴリズム Bilinear Interpolation を SIMD を用いて実装した。
+| 画像の画素補間に用いられるアルゴリズム Bilinear Interpolation を SIMD を用いて実装した。
 
 `PCANet <https://github.com/IshitaTakeshi/PCANet>`__
 -------------------------------------------------------
@@ -139,16 +154,16 @@
 `Ensemble PCANet <https://github.com/IshitaTakeshi/PCANet/tree/ensemble>`__
 ---------------------------------------------------------------------------
 
-| 　PCANet をアンサンブル学習することで分類器の性能向上を図った。また、これを研究成果として `JSAI 2017 <https://www.ai-gakkai.or.jp/jsai2017/webprogram/2017/paper-504.html>`__ で発表した。
+| PCANet をアンサンブル学習することで分類器の性能向上を図った。また、これを研究成果として `JSAI 2017 <https://www.ai-gakkai.or.jp/jsai2017/webprogram/2017/paper-504.html>`__ で発表した。
 
 `DTrie <https://github.com/IshitaTakeshi/dtrie>`__
 --------------------------------------------------
-| 　簡潔データ構造「Trie」のD言語による実装。
-| 　かな漢字変換で使う辞書を少ないメモリで保持するために実装した。
+| 簡潔データ構造 Trie のD言語による実装。
+| かな漢字変換で使う辞書を少ないメモリで保持するために実装した。
 
 `SCW <https://github.com/IshitaTakeshi/SCW>`__
 -------------------------------------------------
-| 　オンライン教師あり線形分類器 SCW (Soft Confidence-Weighted Learning) の実装 [#Wang_et_al_2012]_。
+| オンライン教師あり線形分類器 SCW (Soft Confidence-Weighted Learning) の実装 [#Wang_et_al_2012]_。
 
 Qiita
 =====
@@ -194,4 +209,6 @@ References
 .. [#Steinbrucker_et_al_2011] Steinbrücker Frank, Jürgen Sturm, and Daniel Cremers. "Real-time visual odometry from dense RGB-D images." Computer Vision Workshops (ICCV Workshops), 2011 IEEE International Conference on. IEEE, 2011.
 .. [#Tomasi_et_al_1992] Tomasi, Carlo, and Takeo Kanade. "Shape and motion from image streams under orthography: a factorization method." International journal of computer vision 9 (1992): 137-154.
 .. [#Maeda_et_al_2018] Maeda, Hiroya, et al. "Road damage detection using deep neural networks with images captured through a smartphone." arXiv preprint arXiv:1801.09454 (2018).
+.. [#Shan_et_al_2018] Shan, Tixiao, and Brendan Englot. "Lego-loam: Lightweight and ground-optimized lidar odometry and mapping on variable terrain." 2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS). IEEE, 2018.
+.. [#Shan_et_al_2020] Shan, Tixiao, et al. "Lio-sam: Tightly-coupled lidar inertial odometry via smoothing and mapping." 2020 IEEE/RSJ international conference on intelligent robots and systems (IROS). IEEE, 2020.
 .. [#Wang_et_al_2012] Wang, Jialei, Peilin Zhao, and Steven CH Hoi. "Exact soft confidence-weighted learning." arXiv preprint arXiv:1206.4612 (2012).
