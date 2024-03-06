@@ -77,6 +77,7 @@
 
 | ICP (Iterative Closest Point) の Rust による実装。
 | TIER IV で開発中の OS の上で動かすことを目的としているが、Linux でも動作する。
+|
 
 `YDLiDAR Driver <https://github.com/tier4/lidar_feature_extraction>`__
 ----------------------------------------------------------------------
@@ -85,12 +86,15 @@
 
 .. image:: https://raw.githubusercontent.com/tier4/ydlidar_driver/main/images/plot_scan.gif
 
+|
+
 `LOAM (Refactored version) <https://github.com/tier4/lidar_feature_extraction>`__
 ---------------------------------------------------------------------------------
 
 | LiDAR ベースの SLAM アルゴリズムである LOAM [#Shan_et_al_2018]_ [#Shan_et_al_2020]_ をリファクタリングしたもの。
 | 自動運転用 OSS である `Autoware <https://github.com/autowarefoundation/autoware>`__ と統合して動かすことを目的としている。
-| LiDARから構造特徴を抽出する処理をオリジナルの実装よりも高速化している。
+| LiDAR スキャンから構造特徴を抽出する処理をオリジナルの実装よりも高速化している。
+|
 
 `Tadataka <https://github.com/IshitaTakeshi/Tadataka>`__
 --------------------------------------------------------
@@ -113,6 +117,7 @@
 
 　単眼RGB画像列のみから3次元地図とカメラの軌跡を推定できる。
 
+|
 
 `RoadDamageDetector <https://github.com/IshitaTakeshi/RoadDamageDetector>`__
 -------------------------------------------------------------------------------
@@ -122,11 +127,13 @@
 
 | SSD (Single Shot Multibox Detector) [#Liu_et_al_2016]_ によって道路のひび割れや損傷を検出できる。
 | Maeda らの研究 [#Maeda_et_al_2018]_ を追証している。詳細な解説は `Qiita <https://qiita.com/IshitaTakeshi/items/915de731d8081e711ae5>`__ に掲載されている。
+|
 
 `SBA <https://github.com/IshitaTakeshi/SBA>`__
 -----------------------------------------------
 
 | 高効率な3次元復元アルゴリズム Sparse Bundle Adjustment (SBA) [#Lourakis_et_al_2009]_ を Python で実装した。
+|
 
 `Tomasi-Kanade <https://github.com/IshitaTakeshi/Tomasi-Kanade>`__
 ------------------------------------------------------------------
@@ -136,11 +143,13 @@
 
 | Tomasi-Kanade法 [#Tomasi_et_al_1992]_ による3次元復元の実装。
 | 正投影カメラモデルを用いるので、実世界のアプリケーションとしては利用範囲が限定されるものの、SVDによって高速に3次元復元を行うことができる。
+|
 
 `Bilinear-Interpolation-SIMD <https://github.com/IshitaTakeshi/Bilinear-Interpolation-SIMD>`__
 ----------------------------------------------------------------------------------------------
 
 | 画像の画素補間に用いられるアルゴリズム Bilinear Interpolation を SIMD を用いて実装した。
+|
 
 `PCANet <https://github.com/IshitaTakeshi/PCANet>`__
 -------------------------------------------------------
@@ -150,20 +159,24 @@
 
 | 　PCANet [#Chan_et_al_2015]_ はネットワークの重みを PCA で計算することで高速にバッチ学習できるニューラルネットワークである。このネットワークは Pooling 層でヒストグラム計算を行っており、これが実行速度のボトルネックとなっていた。
 | 　この問題を解消するため、私はヒストグラム計算を CuPy で GPU 向けに実装した。計算を並列化したことで実行速度も大幅に向上した。CuPy開発者の方々の協力もあり、これは後に CuPy 本体にマージされている。 `#298 <https://github.com/cupy/cupy/pull/298>`__
+|
 
 `Ensemble PCANet <https://github.com/IshitaTakeshi/PCANet/tree/ensemble>`__
 ---------------------------------------------------------------------------
 
 | PCANet をアンサンブル学習することで分類器の性能向上を図った。また、これを研究成果として `JSAI 2017 <https://www.ai-gakkai.or.jp/jsai2017/webprogram/2017/paper-504.html>`__ で発表した。
+|
 
 `DTrie <https://github.com/IshitaTakeshi/dtrie>`__
 --------------------------------------------------
 | 簡潔データ構造 Trie のD言語による実装。
 | かな漢字変換で使う辞書を少ないメモリで保持するために実装した。
+|
 
 `SCW <https://github.com/IshitaTakeshi/SCW>`__
 -------------------------------------------------
 | オンライン教師あり線形分類器 SCW (Soft Confidence-Weighted Learning) の実装 [#Wang_et_al_2012]_。
+|
 
 Qiita
 =====
