@@ -123,7 +123,7 @@
 と書くこととすると、 :math:`\frac{d \mathbf{a}(t)}{d t}` は次のように表現できる。
 
 .. math::
-   \frac{d \mathbf{a}(t)}{d t} = \mathbf{a}_{B} + \skew{\mathbf{\omega}} \dot{\mathbf{a}}_{B}
+   \frac{d \mathbf{a}(t)}{d t} = \dot{\mathbf{a}}_{B} + \skew{\mathbf{\omega}} \mathbf{a}_{B}
 
 座標系ごとの表現の違い
 ----------------------
@@ -132,6 +132,6 @@
 
 .. math::
    \frac{d \mathbf{a}(t)}{d t} &= \dot{\mathbf{a}}_{W}  \\
-   \frac{d \mathbf{a}(t)}{d t} &= \mathbf{a}_{B} + \skew{\mathbf{\omega}} \dot{\mathbf{a}}_{B}  \\
+   \frac{d \mathbf{a}(t)}{d t} &= \dot{\mathbf{a}}_{B} + \skew{\mathbf{\omega}} \mathbf{a}_{B}  \\
 
 自動車工学などでは、異なる2つの座標系についてどちらかの座標系を基準としてもう片方の座標系が時間変化する事象をよく扱う。異なる2つの座標系で同一のベクトルの微分について論ずる際は、どちらの座標系上での微分について議論を行っているのかを常に意識しなければならない。
