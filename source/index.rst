@@ -20,6 +20,7 @@ Takeshi Ishita
    sba
    dvo
    graph-slam
+   rotating-coordinate-system
 
 - `重み付きGauss-Newton <https://tier4.github.io/system_software_team_hp/documents/weighted_gauss_newton.html>`__
 - `外れ値に頑強な標準偏差推定法 <https://tier4.github.io/system_software_team_hp/documents/robust_stddev_estimator.html>`__
