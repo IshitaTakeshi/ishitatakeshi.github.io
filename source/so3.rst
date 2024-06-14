@@ -64,7 +64,7 @@
 
 
 .. math::
-    R(t) R(t)^{\top} = I
+    R(t)^{\top} R(t) = I
     :label: orthogonality
 
 
@@ -72,41 +72,41 @@
 
 
 .. math::
-    \frac{d}{dt} (R(t)R(t)^{\top})
-    = \frac{d R(t)}{dt} R(t)^{\top} + R(t)(\frac{d R(t)}{dt})^{\top}
-    = 0
-
-.. math::
     \begin{align}
-        \frac{d R(t)}{dt} R(t)^{\top}
-        &= -R(t)(\frac{d R(t)}{dt})^{\top} \\
-        &= -(\frac{d R(t)}{dt} R(t)^{\top})^{\top}
+    \frac{d}{dt} (R(t)^{\top}R(t)) &= \frac{d R(t)}{dt}^{\top} R(t) + R(t)^{\top}\frac{d R(t)}{dt} = 0, \\ \\
+    -R(t)^{\top}\frac{d R(t)}{dt} &= {\frac{d R(t)}{dt}}^{\top} R(t) \\
+        &= \left[R(t)^{\top}\frac{d R(t)}{dt}\right]^{\top}
     \end{align}
 
 
-したがって :math:`\frac{d R(t)}{dt} R(t)^{\top}` は歪対称行列であり， :math:`\omega \in \mathbb{R}^{3}` を用いて
-
+したがって :math:`R(t)^{\top}\frac{d R(t)}{dt}` は歪対称行列であり， :math:`\omega \in \mathbb{R}^{3}` を用いて
 
 .. math::
     \begin{align}
-        \frac{d R(t)}{dt} R(t)^{\top} &= \skew{\mbf{\omega}} \\
-        \frac{d R(t)}{dt} &= \skew{\mbf{\omega}} R(t)
+        -R(t)^{\top}(\frac{d R(t)}{dt})
+        &= \frac{d R(t)}{dt}^{\top} R(t) \\
+        &= \skew{\mbf{\omega}}, \\\\
+        \frac{d R(t)}{dt} &= -R(t)\skew{\mbf{\omega}}
     \end{align}
     :label: differential-equation-so3
 
 | と表すことができる．
-| 　:math:`R` を3つの直交基底 :math:`\begin{bmatrix} \mbf{e}_{1}(t) & \mbf{e}_{2}(t) & \mbf{e}_{3}(t) \end{bmatrix}` で表現すると， :eq:`differential-equation-so3` は
+| 　:math:`R` を3つの直交基底を用いて :math:`R(t) = \begin{bmatrix} \mbf{e}_{1}(t) & \mbf{e}_{2}(t) & \mbf{e}_{3}(t) \end{bmatrix}^{\top}` と表現すると， :eq:`differential-equation-so3` は
 
 
 .. math::
-    \frac{d \mbf{e}_{i}(t)}{dt} = \skew{\mbf{\omega}} \, \mbf{e}_{i}(t),\; i = 1,\dots,3
+   \begin{align}
+    \frac{d \mbf{e}_{i}(t)}{dt}^{\top} &= -\mbf{e}_{i}(t)^{\top}\skew{\mbf{\omega}},\; &&i = 1,\dots,3  \\  \\
+    \frac{d \mbf{e}_{i}(t)}{dt} &= -\skew{\mbf{\omega}}^{\top}\mbf{e}_{i}(t)  \\
+                                &= \skew{\mbf{\omega}}\mbf{e}_{i}(t),\; &&i = 1,\dots,3
+   \end{align}
 
 
 という微分方程式であることがわかる．この方程式の解は
 
 
 .. math::
-    \mbf{e}_{i}(t) = \exp(\skew{\mbf{\omega}} t) \, \mbf{e}_{i}(0),\; i = 1,\dots,3
+    \mbf{e}_{i}(t) = \exp(\skew{\mbf{\omega}} t)\mbf{e}_{i}(0) ,\; i = 1,\dots,3
 
 
 であることから， :math:`R(t)` は :math:`\mbf{\omega}` を用いて
