@@ -21,10 +21,12 @@
 .. math::
    \begin{align}
         \mathbf{v}(t)
-        &= a_{i}\E_{i} + a_{j}\E_{j} + a_{k}\E_{k}  \\
-        &= a_{x}\E_{x} + a_{y}\E_{y} + a_{z}\E_{z}  \\
-        &= \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} a_{x} \\ a_{y} \\ a_{z} \end{bmatrix} \\
+        &= v_{i}\E_{i} + v_{j}\E_{j} + v_{k}\E_{k}  \\
+        &= v_{x}\E_{x} + v_{y}\E_{y} + v_{z}\E_{z}  \\
    \end{align}
+   :label: vector-representation
+
+自動車の速度を表すベクトルはこの要件を満たす。車が走っている世界の座標系を :math:`O(\E_{i}, \E_{j}, \E_{k})` 、車体の座標系を :math:`O'(\E_{x}, \E_{y}, \E_{z})` とし、車体の速度ベクトルを :math:`\mathbf{v}` とすれば、式 :eq:`vector-representation` によって車体の速度ベクトルを世界座標系と車体座標系(回転座標系)でそれぞれ表現できる。
 
 固定座標系上での時間微分
 ------------------------
@@ -35,17 +37,17 @@
 
 .. math::
    \frac{d \mathbf{v}(t)}{d t}
-   &= \frac{d}{d t}(a_{i}\E_{i} + a_{j}\E_{j} + a_{k}\E_{k}) \\
-   &= \frac{d}{d t}(a_{i}\E_{i}) + \frac{d}{d t}(a_{j}\E_{j}) + \frac{d}{d t}(a_{k}\E_{k}) \\
-   &= \frac{d a_{i}}{d t}\E_{i} + \frac{d a_{j}}{d t}\E_{j} + \frac{d a_{k}}{d t}\E_{k}
-    + a_{i}\frac{d \E_{i}}{d t} + a_{j}\frac{d \E_{j}}{d t} + a_{k}\frac{d \E_{k}}{d t} \\
-   &= \frac{d a_{i}}{d t}\E_{i} + \frac{d a_{j}}{d t}\E_{j} + \frac{d a_{k}}{d t}\E_{k}  \\
-   &= \begin{bmatrix} \E_{i} & \E_{j} & \E_{k} \end{bmatrix} \begin{bmatrix} \frac{d a_{i}}{dt} \\ \frac{d a_{j}}{dt} \\ \frac{d a_{k}}{dt} \end{bmatrix} \\
+   &= \frac{d}{d t}(v_{i}\E_{i} + v_{j}\E_{j} + v_{k}\E_{k}) \\
+   &= \frac{d}{d t}(v_{i}\E_{i}) + \frac{d}{d t}(v_{j}\E_{j}) + \frac{d}{d t}(v_{k}\E_{k}) \\
+   &= \frac{d v_{i}}{d t}\E_{i} + \frac{d v_{j}}{d t}\E_{j} + \frac{d v_{k}}{d t}\E_{k}
+    + v_{i}\frac{d \E_{i}}{d t} + v_{j}\frac{d \E_{j}}{d t} + v_{k}\frac{d \E_{k}}{d t} \\
+   &= \frac{d v_{i}}{d t}\E_{i} + \frac{d v_{j}}{d t}\E_{j} + \frac{d v_{k}}{d t}\E_{k}  \\
+   &= \begin{bmatrix} \E_{i} & \E_{j} & \E_{k} \end{bmatrix} \begin{bmatrix} \frac{d v_{i}}{dt} \\ \frac{d v_{j}}{dt} \\ \frac{d v_{k}}{dt} \end{bmatrix} \\
 
 固定座標系上のベクトルの固定座標系上での微分を、添字 :math:`W` を用いて
 
 .. math::
-   \dot{\mathbf{v}}_{W} = \frac{d a_{i}}{dt}\E_{i} + \frac{d a_{j}}{dt}\E_{j} + \frac{d a_{k}}{dt}\E_{k}
+   \dot{\mathbf{v}}_{W} = \frac{d v_{i}}{dt}\E_{i} + \frac{d v_{j}}{dt}\E_{j} + \frac{d v_{k}}{dt}\E_{k}
 
 と書くこととすると、
 
@@ -61,9 +63,9 @@
 
 .. math::
    \frac{d \mathbf{v}(t)}{d t}
-   &= \frac{d}{d t}(a_{x}\E_{x} + a_{y}\E_{y} + a_{z}\E_{z})  \\
-   &= \frac{d a_{x}}{d t}\E_{x} + \frac{d a_{y}}{d t}\E_{y} + \frac{d a_{z}}{d t}\E_{z}
-    + a_{x}\frac{d \E_{x}}{d t} + a_{y}\frac{d \E_{y}}{d t} + a_{z}\frac{d \E_{z}}{d t}
+   &= \frac{d}{d t}(v_{x}\E_{x} + v_{y}\E_{y} + v_{z}\E_{z})  \\
+   &= \frac{d v_{x}}{d t}\E_{x} + \frac{d v_{y}}{d t}\E_{y} + \frac{d v_{z}}{d t}\E_{z}
+    + v_{x}\frac{d \E_{x}}{d t} + v_{y}\frac{d \E_{y}}{d t} + v_{z}\frac{d \E_{z}}{d t}
    :label: derivative-on-rotation-coordinate
 
 さて、回転座標系の時間微分を具体的に求めてみよう。
@@ -111,18 +113,18 @@
 
 .. math::
    \frac{d \mathbf{v}(t)}{d t}
-   &= \frac{d a_{x}}{d t}\E_{x} + \frac{d a_{y}}{d t}\E_{y} + \frac{d a_{z}}{d t}\E_{z}
-    + a_{x}\frac{d \E_{x}}{d t} + a_{y}\frac{d \E_{y}}{d t} + a_{z}\frac{d \E_{z}}{d t} \\
-   &= \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} \frac{d a_{x}}{dt} \\ \frac{d a_{y}}{dt} \\ \frac{d a_{z}}{dt} \end{bmatrix}
-   + \frac{d}{dt} \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} a_{x} \\ a_{y} \\ a_{z} \end{bmatrix}  \\
-   &= \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} \frac{d a_{x}}{dt} \\ \frac{d a_{y}}{dt} \\ \frac{d a_{z}}{dt} \end{bmatrix}
-   + \skew{\mathbf{\omega}} \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} a_{x} \\ a_{y} \\ a_{z} \end{bmatrix}
+   &= \frac{d v_{x}}{d t}\E_{x} + \frac{d v_{y}}{d t}\E_{y} + \frac{d v_{z}}{d t}\E_{z}
+    + v_{x}\frac{d \E_{x}}{d t} + v_{y}\frac{d \E_{y}}{d t} + v_{z}\frac{d \E_{z}}{d t} \\
+   &= \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} \frac{d v_{x}}{dt} \\ \frac{d v_{y}}{dt} \\ \frac{d v_{z}}{dt} \end{bmatrix}
+   + \frac{d}{dt} \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} v_{x} \\ v_{y} \\ v_{z} \end{bmatrix}  \\
+   &= \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} \frac{d v_{x}}{dt} \\ \frac{d v_{y}}{dt} \\ \frac{d v_{z}}{dt} \end{bmatrix}
+   + \skew{\mathbf{\omega}} \begin{bmatrix} \E_{x} & \E_{y} & \E_{z} \end{bmatrix} \begin{bmatrix} v_{x} \\ v_{y} \\ v_{z} \end{bmatrix}
 
 回転座標系上のベクトルと、回転座標系上のベクトルの回転座標系上での微分を、添字 :math:`B` を用いてそれぞれ
 
 .. math::
-   \mathbf{v}_{B} &= a_{x} \E_{x} + a_{y} \E_{y} + a_{z} \E_{z} \\
-   \dot{\mathbf{v}}_{B} &= \frac{d a_{x}}{dt}\E_{x} + \frac{d a_{y}}{dt}\E_{y} + \frac{d a_{z}}{dt}\E_{z} \\
+   \mathbf{v}_{B} &= v_{x} \E_{x} + v_{y} \E_{y} + v_{z} \E_{z} \\
+   \dot{\mathbf{v}}_{B} &= \frac{d v_{x}}{dt}\E_{x} + \frac{d v_{y}}{dt}\E_{y} + \frac{d v_{z}}{dt}\E_{z} \\
 
 と書くこととすると、 :math:`\frac{d \mathbf{v}(t)}{d t}` は次のように表現できる。
 
