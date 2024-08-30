@@ -5,12 +5,17 @@ Takeshi Ishita
 Work Experience
 ===============
 
+`CyberAgent AI Lab <https://research.cyberagent.ai/>`__
+-------------------------------------------------------
+
+July 2024 -
+
 `Tier IV, Inc. <https://tier4.jp/>`__
 ---------------------------------------------------------------------------
 
 R&D of vehicle localization
 
-| July 2020 - Present
+| July 2020 - June 2024
 
 `Mitou Program <https://www.ipa.go.jp/jinzai/mitou/2019/gaiyou_s-2.html>`__
 ---------------------------------------------------------------------------
