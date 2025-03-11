@@ -74,15 +74,24 @@
 成果物
 ======
 
+`Visual Relocalization  <https://github.com/CyberAgentAILab/visual-relocalization-colmap>`__
+--------------------------------------------------------------------------------------------
+
+COLMAP 地図と単眼カメラを活用した自己位置推定
+
+.. image:: images/demo-relocalization.gif
+    :width: 800
+
+
+
 `icp_rust <https://github.com/tier4/icp_rust>`__
 ------------------------------------------------
 
-.. image:: images/icp.gif
-    :width: 800
-
 | ICP (Iterative Closest Point) の Rust による実装。
 | TIER IV で開発中の OS の上で動かすことを目的としているが、Linux でも動作する。
-|
+
+.. image:: images/icp.gif
+    :width: 800
 
 `YDLiDAR Driver <https://github.com/tier4/lidar_feature_extraction>`__
 ----------------------------------------------------------------------
