@@ -26,3 +26,5 @@ Takeshi Ishita
 - `外れ値に頑強な標準偏差推定法 <https://tier4.github.io/system_software_team_hp/documents/robust_stddev_estimator.html>`__
 - `EKFの可観測性 <https://tier4.github.io/system_software_team_hp/documents/ekf-slam-observability.html>`__
 - `角速度バイアス推定方法 <https://tier4.github.io/system_software_team_hp/documents/gyroscope-bias-estimation.html>`__
+- `ピンホールカメラモデル <https://cyberagentailab.github.io/visual-localization-documentation/pinhole_camera_model.html>`__
+- `ワールド座標系とカメラ座標系 <https://cyberagentailab.github.io/visual-localization-documentation/coordinate_transform.html>`__
