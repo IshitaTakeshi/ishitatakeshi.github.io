@@ -212,6 +212,7 @@ Qiita
 =============
 
 - `自己位置推定の取り組み <https://docswell.com/s/IshitaTakeshi/ZXE482-roscon-jp-lt/1>`__
+- `Visual Relocalization <https://www.docswell.com/s/IshitaTakeshi/KR264N-visual-relocalization-colmap>`__
 - `Graph SLAM の Marginalization <https://drive.google.com/file/d/1PxPDX3rvSvlKhNZMtHt2xWiYyDU44WSj/view?pli=1>`__
 - `Sparse Bundle Adjustment <https://speakerdeck.com/ishitatakeshi/sparse-bundle-adjustment>`__
 - `3次元回転表現とその実装 <https://speakerdeck.com/ishitatakeshi/3d-rotation-representation-and-its-implementation>`__
