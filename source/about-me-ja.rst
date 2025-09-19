@@ -208,6 +208,11 @@ Qiita
 - `TIER IV Tech Blog 「Visual-Inertial Odometryが自動運転に与えるインパクトと応用への課題」 <https://tech.tier4.jp/entry/2021/07/22/120000>`__
 - 日本写真測量学会　写真測量とリモートセンシング　2023年11月号　「市街地における自動運転へのSLAMの活用」
 
+外部発表
+========
+
+- `MIRU2025デモ発表「店舗小売現場における商品配置支援アプリケーションの開発」 <https://cvim.ipsj.or.jp/MIRU2025/presentations_demo.html>`__
+
 発表資料
 =============
 
