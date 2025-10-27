@@ -83,7 +83,6 @@ COLMAP 地図と単眼カメラを活用した自己位置推定
     :width: 800
 
 
-
 `icp_rust <https://github.com/tier4/icp_rust>`__
 ------------------------------------------------
 
@@ -93,8 +92,8 @@ COLMAP 地図と単眼カメラを活用した自己位置推定
 .. image:: images/icp.gif
     :width: 800
 
-`YDLiDAR Driver <https://github.com/tier4/lidar_feature_extraction>`__
-----------------------------------------------------------------------
+`YDLiDAR Driver <https://github.com/tier4/ydlidar_driver>`__
+------------------------------------------------------------
 
 手のひらサイズの小型な LiDAR である `YDLiDAR T-mini Pro <https://www.ydlidar.com/products/view/22.html>`__ の Rust 製ドライバ。
 
@@ -212,6 +211,8 @@ Qiita
 ========
 
 - `MIRU2025デモ発表「店舗小売現場における商品配置支援アプリケーションの開発」 <https://cvim.ipsj.or.jp/MIRU2025/presentations_demo.html>`__
+- `ROSCon JP LT「Visual Relocalization」 <https://www.docswell.com/s/IshitaTakeshi/KR264N-visual-relocalization-colmap>`__
+
 
 発表資料
 =============
