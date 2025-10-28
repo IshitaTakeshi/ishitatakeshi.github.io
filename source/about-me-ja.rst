@@ -211,12 +211,13 @@ Qiita
 ========
 
 - `MIRU2025デモ発表「店舗小売現場における商品配置支援アプリケーションの開発」 <https://cvim.ipsj.or.jp/MIRU2025/presentations_demo.html>`__
-- `ROSCon JP LT「Visual Relocalization」 <https://www.docswell.com/s/IshitaTakeshi/KR264N-visual-relocalization-colmap>`__
 
 
 発表資料
 =============
 
+- `CLIP による店舗内商品検索 <https://www.docswell.com/s/IshitaTakeshi/K1RNMG-in-store-product-search>`__
+- `Raspberry Pi で動かすカメラベースオドメトリ推定 <https://www.docswell.com/s/IshitaTakeshi/Z82649-raspberry-pi-odometry-estimation>`__
 - `自己位置推定の取り組み <https://docswell.com/s/IshitaTakeshi/ZXE482-roscon-jp-lt/1>`__
 - `Visual Relocalization <https://www.docswell.com/s/IshitaTakeshi/KR264N-visual-relocalization-colmap>`__
 - `Graph SLAM の Marginalization <https://drive.google.com/file/d/1PxPDX3rvSvlKhNZMtHt2xWiYyDU44WSj/view?pli=1>`__
@@ -225,6 +226,7 @@ Qiita
 - `CUDAでヒストグラム計算を書いてcupyにmergeしてもらった <https://speakerdeck.com/ishitatakeshi/cudadehisutoguramuji-suan-woshu-itecupynimergesitemoratuta-1>`__
 - `Juliaでオンライン線形分類器つくった <https://www.slideshare.net/TakeshiIshita/julia-56356347>`__
 - `マルウェア分類に用いられる特徴量 Kaggle - Malware Classification Challenge勉強会 <https://www.slideshare.net/TakeshiIshita/kaggle-malware-classification-challenge>`__
+- `ROSCon JP LT「Visual Relocalization」 <https://www.docswell.com/s/IshitaTakeshi/KR264N-visual-relocalization-colmap>`__
 
 リンク
 ======
