@@ -13,11 +13,11 @@ Graph SLAMとは、SLAMの最適化問題をグラフ構造で表現する手法
    SLAMは周囲の観測情報(橙色)と運動情報(青色)を用いてセンサ姿勢を推定する。
 
 センサ姿勢をノードで表現すると、異なる2時刻間の姿勢関係をそれらノードをつなぐエッジで表現することができる。ランドマークも同様にノードで表現することができる。これにより、ランドマークとセンサ姿勢の関係をこれらをつなぐエッジで表現することができる。
-たとえば :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現すると :numref:`homeomorphic-graph` のようになる。
+たとえば :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現すると :numref:`homomorphic-graph` のようになる。
 
-.. _homeomorphic-graph:
+.. _homomorphic-graph:
 
-.. figure:: images/homeomorphic-graph.svg
+.. figure:: images/homomorphic-graph.svg
 
     :numref:`motion-and-observation` におけるセンサとランドマークの関係をグラフで表現したもの。エッジにはセンサの観測値を対応させている。
 
